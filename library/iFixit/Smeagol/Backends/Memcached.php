@@ -19,7 +19,7 @@ class Memcached extends Smeagol\Backends\Backend {
    public function get($key) {
       $value = $this->memcached->get($key);
 
-      return $value === false ? null : $value;
+      return $value === false ? $this->miss() : $value;
    }
 
    public function delete($key) {
