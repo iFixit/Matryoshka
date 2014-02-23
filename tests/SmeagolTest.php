@@ -53,4 +53,31 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
          $this->assertNull($backend->get($key));
       }
    }
+
+   public function testgetAndSet() {
+      $cache = new \iFixit\Smeagol\Backends\MemoryArray();
+      $key = 'key';
+      $value = 'value';
+
+      $this->assertNull($cache->get($key));
+
+      $hit = false;
+      $callback = function() use ($value, &$hit) {
+         $hit = true;
+         return $value;
+      };
+
+      $getAndSetValue = $cache->getAndSet($key, $callback);
+
+      $this->assertTrue($hit);
+      $this->assertSame($value, $getAndSetValue);
+      $this->assertSame($value, $cache->get($key));
+
+      $hit = false;
+      $getAndSetValue = $cache->getAndSet($key, $callback);
+
+      $this->assertFalse($hit);
+      $this->assertSame($value, $getAndSetValue);
+      $this->assertSame($value, $cache->get($key));
+   }
 }

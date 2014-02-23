@@ -12,6 +12,17 @@ abstract class Backend {
    public abstract function get($key);
    public abstract function delete($key);
 
+   public function getAndSet($key, $callback) {
+      $value = $this->get($key);
+
+      if ($value === null) {
+         $value = $callback();
+         $this->set($key, $value);
+      }
+
+      return $value;
+   }
+
    public function miss() {
       return null;
    }
