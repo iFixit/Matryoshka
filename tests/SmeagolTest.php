@@ -72,6 +72,40 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $this->assertNull($memoryCache->get($key));
    }
 
+   public function testScoped() {
+      $memoryCache = new \iFixit\Smeagol\Backends\MemoryArray();
+      $scope = 'scope';
+      $scopedCache = new \iFixit\Smeagol\Backends\Scoped($memoryCache,
+       $scope);
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+
+      $this->assertNull($scopedCache->get($key1));
+
+      $scopedCache->set($key1, $value1);
+
+      $this->assertSame($value1, $scopedCache->get($key1));
+
+      $scopedCache->delete($key1);
+
+      $this->assertNull($scopedCache->get($key1));
+
+      $scopedCache->set($key1, $value1);
+      $scopedCache->set($key2, $value2);
+
+      $this->assertSame($value1, $scopedCache->get($key1));
+      $this->assertSame($value2, $scopedCache->get($key2));
+
+      $scopedCache->deleteScope();
+
+      $this->assertNull($scopedCache->get($key1));
+      $this->assertNull($scopedCache->get($key2));
+
+      $scopedCache->set($key1, $value1);
+
+      $this->assertSame($value1, $scopedCache->get($key1));
+   }
+
    public function testMemcached() {
       $cache = new \iFixit\Smeagol\Backends\Memcached($this->getMemcached());
       list($key, $value) = $this->getRandomKeyValue();
