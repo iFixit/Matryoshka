@@ -20,4 +20,37 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
       $this->assertNull($cache->get($key));
    }
+
+   public function testHierarchy() {
+      $backends = [
+         new \iFixit\Smeagol\Backends\MemoryArray(),
+         new \iFixit\Smeagol\Backends\MemoryArray()
+      ];
+
+      $hierarchy = new \iFixit\Smeagol\Backends\Hierarchy($backends);
+
+      $allBackends = array_merge($backends, [$hierarchy]);
+
+      $key = 'test';
+      $value = 'value';
+      $this->assertNull($hierarchy->get($key));
+
+      $hierarchy->set($key, $value);
+
+      foreach ($allBackends as $backend) {
+         $this->assertSame($value, $backend->get($key));
+      }
+
+      $backends[0]->delete($key);
+
+      $this->assertSame($value, $hierarchy->get($key));
+
+      $this->assertSame($value, $backends[0]->get($key));
+
+      $hierarchy->delete($key);
+
+      foreach ($allBackends as $backend) {
+         $this->assertNull($backend->get($key));
+      }
+   }
 }
