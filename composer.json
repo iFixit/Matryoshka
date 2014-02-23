@@ -1,0 +1,21 @@
+{
+   "name": "iFixit/Smeagol",
+   "description": "PHP Caching Library",
+   "keywords": ["cache", "memcached"],
+   "homepage": "https://github.com/iFixit/Smeagol",
+   "type": "library",
+   "license": "MIT",
+   "authors": [
+      {
+         "name": "Marc Zych",
+         "email": "marc@ifixit.com",
+         "homepage": "https://github.com/marczych"
+      }
+   ],
+   "require": {
+      "php": ">=5.4.0"
+   },
+   "autoload": {
+      "psr-0": {"iFixit": "library/"}
+   }
+}
