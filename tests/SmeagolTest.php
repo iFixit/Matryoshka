@@ -23,7 +23,7 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    public function testHierarchy() {
       $backends = [
          new \iFixit\Smeagol\Backends\MemoryArray(),
-         new \iFixit\Smeagol\Backends\MemoryArray()
+         new \iFixit\Smeagol\Backends\Memcached($this->getMemcached())
       ];
       $hierarchy = new \iFixit\Smeagol\Backends\Hierarchy($backends);
       $allBackends = array_merge($backends, [$hierarchy]);
@@ -73,9 +73,7 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testMemcached() {
-      $memcache = new Memcache();
-      $memcache->pconnect('localhost', 11211);
-      $cache = new \iFixit\Smeagol\Backends\Memcached($memcache);
+      $cache = new \iFixit\Smeagol\Backends\Memcached($this->getMemcached());
       list($key, $value) = $this->getRandomKeyValue();
 
       $this->assertNull($cache->get($key));
@@ -115,10 +113,17 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($value, $cache->get($key));
    }
 
-   public function getRandomKeyValue() {
+   private function getRandomKeyValue() {
       return [
          'key-' . microtime(true) * 100,
          'value-' . microtime(true) * 100
       ];
+   }
+
+   private function getMemcached() {
+      $memcache = new Memcache();
+      $memcache->pconnect('localhost', 11211);
+
+      return $memcache;
    }
 }
