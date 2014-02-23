@@ -54,6 +54,29 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       }
    }
 
+   public function testPrefixed() {
+      $memoryCache = new \iFixit\Smeagol\Backends\MemoryArray();
+      $prefix = 'prefix';
+      $prefixedCache = new \iFixit\Smeagol\Backends\Prefixed($memoryCache,
+       $prefix);
+      $key = 'key';
+      $value = 'value';
+
+      $this->assertNull($prefixedCache->get($key));
+
+      $prefixedCache->set($key, $value);
+
+      $this->assertSame($value, $prefixedCache->get($key));
+      $this->assertSame($value, $memoryCache->get("{$prefix}{$key}"));
+      $this->assertNull($memoryCache->get($key));
+
+      $prefixedCache->delete($key);
+
+      $this->assertNull($prefixedCache->get($key));
+      $this->assertNull($memoryCache->get("{$prefix}{$key}"));
+      $this->assertNull($memoryCache->get($key));
+   }
+
    public function testgetAndSet() {
       $cache = new \iFixit\Smeagol\Backends\MemoryArray();
       $key = 'key';
