@@ -2,11 +2,14 @@
 
 require_once __DIR__ . '/../library/iFixit/Smeagol.php';
 
-\iFixit\Smeagol::autoload();
+use iFixit\Smeagol;
+use iFixit\Smeagol\Backends;
+
+Smeagol::autoload();
 
 class SmeagolTest extends PHPUnit_Framework_TestCase {
    public function testMemoryArray() {
-      $cache = new \iFixit\Smeagol\Backends\MemoryArray();
+      $cache = new Backends\MemoryArray();
       list($key, $value) = $this->getRandomKeyValue();
 
       $this->assertNull($cache->get($key));
@@ -22,10 +25,10 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
    public function testHierarchy() {
       $backends = [
-         new \iFixit\Smeagol\Backends\MemoryArray(),
-         new \iFixit\Smeagol\Backends\Memcached($this->getMemcached())
+         new Backends\MemoryArray(),
+         new Backends\Memcached($this->getMemcached())
       ];
-      $hierarchy = new \iFixit\Smeagol\Backends\Hierarchy($backends);
+      $hierarchy = new Backends\Hierarchy($backends);
       $allBackends = array_merge($backends, [$hierarchy]);
       list($key, $value) = $this->getRandomKeyValue();
 
@@ -56,9 +59,9 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testPrefixed() {
-      $memoryCache = new \iFixit\Smeagol\Backends\MemoryArray();
+      $memoryCache = new Backends\MemoryArray();
       $prefix = 'prefix';
-      $prefixedCache = new \iFixit\Smeagol\Backends\Prefixed($memoryCache,
+      $prefixedCache = new Backends\Prefixed($memoryCache,
        $prefix);
       list($key, $value) = $this->getRandomKeyValue();
 
@@ -78,9 +81,9 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testScoped() {
-      $memoryCache = new \iFixit\Smeagol\Backends\MemoryArray();
+      $memoryCache = new Backends\MemoryArray();
       $scope = 'scope';
-      $scopedCache = new \iFixit\Smeagol\Backends\Scoped($memoryCache,
+      $scopedCache = new Backends\Scoped($memoryCache,
        $scope);
       list($key1, $value1) = $this->getRandomKeyValue();
       list($key2, $value2) = $this->getRandomKeyValue();
@@ -112,7 +115,7 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testMemcached() {
-      $cache = new \iFixit\Smeagol\Backends\Memcached($this->getMemcached());
+      $cache = new Backends\Memcached($this->getMemcached());
       list($key, $value) = $this->getRandomKeyValue();
 
       $this->assertNull($cache->get($key));
@@ -134,7 +137,7 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testgetAndSet() {
-      $cache = new \iFixit\Smeagol\Backends\MemoryArray();
+      $cache = new Backends\MemoryArray();
       list($key, $value) = $this->getRandomKeyValue();
 
       $this->assertNull($cache->get($key));

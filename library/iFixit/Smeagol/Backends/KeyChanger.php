@@ -4,12 +4,12 @@ namespace iFixit\Smeagol\Backends;
 
 use iFixit\Smeagol;
 
-abstract class KeyChanger extends Smeagol\Backends\Backend {
+abstract class KeyChanger extends Backend {
    private $backend;
 
    public abstract function changeKey($key);
 
-   public function __construct(Smeagol\Backends\Backend $backend) {
+   public function __construct(Backend $backend) {
       $this->backend = $backend;
    }
 

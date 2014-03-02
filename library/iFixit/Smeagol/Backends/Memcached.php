@@ -4,7 +4,7 @@ namespace iFixit\Smeagol\Backends;
 
 use iFixit\Smeagol;
 
-class Memcached extends Smeagol\Backends\Backend {
+class Memcached extends Backend {
    const FLAGS = MEMCACHE_COMPRESSED;
 
    private $memcached;

@@ -7,7 +7,7 @@ use iFixit\Smeagol;
 /**
  * Cache hierarchy.
  */
-class Hierarchy extends Smeagol\Backends\Backend {
+class Hierarchy extends Backend {
    private $backends;
    private $backendCount;
 

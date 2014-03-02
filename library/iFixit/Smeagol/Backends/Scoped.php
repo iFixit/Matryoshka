@@ -4,12 +4,12 @@ namespace iFixit\Smeagol\Backends;
 
 use iFixit\Smeagol;
 
-class Scoped extends Smeagol\Backends\KeyChanger {
+class Scoped extends KeyChanger {
    private $backend;
    private $scopeName;
    private $scopePrefix;
 
-   public function __construct(Smeagol\Backends\Backend $backend, $scopeName) {
+   public function __construct(Backend $backend, $scopeName) {
       parent::__construct($backend);
 
       $this->scopeName = $scopeName;
