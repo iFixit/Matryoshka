@@ -17,7 +17,7 @@ abstract class Backend {
    public function getAndSet($key, callable $callback, $expiration = 0) {
       $value = $this->get($key);
 
-      if ($value === null) {
+      if ($value === self::MISS) {
          $value = $callback();
          $this->set($key, $value, $expiration);
       }

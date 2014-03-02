@@ -26,7 +26,7 @@ class Hierarchy extends Backend {
       for ($i = 0; $i < $this->backendCount; $i++) {
          $value = $this->backends[$i]->get($key);
 
-         if ($value !== null) {
+         if ($value !== self::MISS) {
             for ($j = 0; $j < $i; $j++) {
                // TODO: This doesn't have an expiration time because we don't
                // know what it is on a get.
