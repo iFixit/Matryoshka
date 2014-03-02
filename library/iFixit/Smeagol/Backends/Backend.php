@@ -10,16 +10,16 @@ use iFixit\Smeagol;
 abstract class Backend {
    const MISS = null;
 
-   public abstract function set($key, $value);
+   public abstract function set($key, $value, $expiration = 0);
    public abstract function get($key);
    public abstract function delete($key);
 
-   public function getAndSet($key, callable $callback) {
+   public function getAndSet($key, callable $callback, $expiration = 0) {
       $value = $this->get($key);
 
       if ($value === null) {
          $value = $callback();
-         $this->set($key, $value);
+         $this->set($key, $value, $expiration);
       }
 
       return $value;

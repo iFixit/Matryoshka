@@ -24,6 +24,7 @@ class Scoped extends Smeagol\Backends\KeyChanger {
 
    private function getScopePrefix() {
       if ($this->scopePrefix === null) {
+         // TODO: This doesn't set an expiration time. Make it user configurable?
          $this->scopePrefix = $this->backend->getAndSet($this->getScopeKey(),
           function() {
             return substr(md5(microtime()), 0, 4);

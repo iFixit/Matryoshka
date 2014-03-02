@@ -10,7 +10,8 @@ use iFixit\Smeagol;
 class MemoryArray extends Smeagol\Backends\Backend {
    private $cache = [];
 
-   public function set($key, $value) {
+   public function set($key, $value, $expiration = 0) {
+      // TODO: This doesn't use the expiration time at all.
       $this->cache[$key] = $value;
    }
 

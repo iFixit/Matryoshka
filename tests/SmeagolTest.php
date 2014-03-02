@@ -124,6 +124,13 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $cache->delete($key);
 
       $this->assertNull($cache->get($key));
+
+      list($key, $value) = $this->getRandomKeyValue();
+      $cache->set($key, $value, 1);
+      // Wait for it to expire.
+      sleep(2);
+
+      $this->assertNull($cache->get($key));
    }
 
    public function testgetAndSet() {

@@ -16,9 +16,9 @@ class Hierarchy extends Smeagol\Backends\Backend {
       $this->backendCount = count($this->backends);
    }
 
-   public function set($key, $value) {
+   public function set($key, $value, $expiration = 0) {
       foreach ($this->backends as $backend) {
-         $backend->set($key, $value);
+         $backend->set($key, $value, $expiration);
       }
    }
 
@@ -28,6 +28,8 @@ class Hierarchy extends Smeagol\Backends\Backend {
 
          if ($value !== null) {
             for ($j = 0; $j < $i; $j++) {
+               // TODO: This doesn't have an expiration time because we don't
+               // know what it is on a get.
                $this->backends[$j]->set($key, $value);
             }
 

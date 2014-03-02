@@ -5,6 +5,8 @@ namespace iFixit\Smeagol\Backends;
 use iFixit\Smeagol;
 
 class Memcached extends Smeagol\Backends\Backend {
+   const FLAGS = MEMCACHE_COMPRESSED;
+
    private $memcached;
 
    // TODO: Change to Memcached.
@@ -12,8 +14,8 @@ class Memcached extends Smeagol\Backends\Backend {
       $this->memcached = $memcache;
    }
 
-   public function set($key, $value) {
-      $this->memcached->set($key, $value);
+   public function set($key, $value, $expiration = 0) {
+      $this->memcached->set($key, $value, self::FLAGS, $expiration);
    }
 
    public function get($key) {

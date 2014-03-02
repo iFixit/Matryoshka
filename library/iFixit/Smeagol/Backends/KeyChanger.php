@@ -13,8 +13,8 @@ abstract class KeyChanger extends Smeagol\Backends\Backend {
       $this->backend = $backend;
    }
 
-   public function set($key, $value) {
-      $this->backend->set($this->changeKey($key), $value);
+   public function set($key, $value, $expiration = 0) {
+      $this->backend->set($this->changeKey($key), $value, $expiration);
    }
 
    public function get($key) {
