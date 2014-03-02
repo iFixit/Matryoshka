@@ -10,6 +10,7 @@ use iFixit\Smeagol;
 abstract class Backend {
    const MISS = null;
 
+   // TODO: Set and delete should return true/false for success/failure.
    public abstract function set($key, $value, $expiration = 0);
    public abstract function get($key);
    public abstract function delete($key);

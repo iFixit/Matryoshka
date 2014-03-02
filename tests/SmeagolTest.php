@@ -136,6 +136,28 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $this->assertNull($cache->get($key));
    }
 
+   public function testEnabled() {
+      $cache = new Backends\Enabled(new Backends\MemoryArray());
+      list($key, $value) = $this->getRandomKeyValue();
+
+      $cache->setsEnabled = false;
+      $cache->set($key, $value);
+      $this->assertNull($cache->get($key));
+      $cache->setsEnabled = true;
+
+      $cache->set($key, $value);
+      $this->assertSame($value, $cache->get($key));
+
+      $cache->getsEnabled = false;
+      $this->assertNull($cache->get($key));
+      $cache->getsEnabled = true;
+
+      $cache->deletesEnabled = false;
+      $cache->delete($key);
+      $this->assertSame($value, $cache->get($key));
+      $cache->deletesEnabled = true;
+   }
+
    public function testgetAndSet() {
       $cache = new Backends\MemoryArray();
       list($key, $value) = $this->getRandomKeyValue();
