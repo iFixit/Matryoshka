@@ -30,6 +30,8 @@ class Hierarchy extends Smeagol\Backends\Backend {
             for ($j = 0; $j < $i; $j++) {
                $this->backends[$j]->set($key, $value);
             }
+
+            break;
          }
       }
 

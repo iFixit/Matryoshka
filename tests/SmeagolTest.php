@@ -40,7 +40,6 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $backends[0]->delete($key);
 
       $this->assertSame($value, $hierarchy->get($key));
-
       $this->assertSame($value, $backends[0]->get($key));
 
       $hierarchy->delete($key);
@@ -48,6 +47,12 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       foreach ($allBackends as $backend) {
          $this->assertNull($backend->get($key));
       }
+
+      list($key, $value) = $this->getRandomKeyValue();
+      $hierarchy->set($key, $value);
+
+      $backends[1]->delete($key);
+      $this->assertSame($value, $hierarchy->get($key));
    }
 
    public function testPrefixed() {
