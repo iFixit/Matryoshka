@@ -21,6 +21,14 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue($cache->delete($key));
 
       $this->assertNull($cache->get($key));
+
+
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+      $this->assertTrue($cache->add($key1, $value1));
+      $this->assertSame($value1, $cache->get($key1));
+      $this->assertFalse($cache->add($key1, $value2));
+      $this->assertSame($value1, $cache->get($key1));
    }
 
    public function testHierarchy() {
@@ -134,6 +142,14 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       sleep(2);
 
       $this->assertNull($cache->get($key));
+
+
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+      $this->assertTrue($cache->add($key1, $value1));
+      $this->assertSame($value1, $cache->get($key1));
+      $this->assertFalse($cache->add($key1, $value2));
+      $this->assertSame($value1, $cache->get($key1));
    }
 
    public function testEnabled() {

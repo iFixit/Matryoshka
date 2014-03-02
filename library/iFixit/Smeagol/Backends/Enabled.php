@@ -28,6 +28,14 @@ class Enabled extends Backend {
       }
    }
 
+   public function add($key, $value, $expiration = 0) {
+      if ($this->setsEnabled) {
+         return $this->backend->add($key, $value, $expiration);
+      } else {
+         return false;
+      }
+   }
+
    public function get($key) {
       if ($this->getsEnabled) {
          return $this->backend->get($key);

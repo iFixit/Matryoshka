@@ -21,6 +21,16 @@ class MemoryArray extends Backend {
       return true;
    }
 
+   public function add($key, $value, $expiration = 0) {
+      // TODO: This doesn't use the expiration time at all.
+      if (!array_key_exists($key, $this->cache)) {
+         $this->cache[$key] = $value;
+         return true;
+      } else {
+         return false;
+      }
+   }
+
    public function get($key) {
       if (array_key_exists($key, $this->cache)) {
          return $this->cache[$key];

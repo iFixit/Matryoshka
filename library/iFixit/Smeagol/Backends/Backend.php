@@ -11,6 +11,7 @@ abstract class Backend {
    const MISS = null;
 
    public abstract function set($key, $value, $expiration = 0);
+   public abstract function add($key, $value, $expiration = 0);
    public abstract function get($key);
    public abstract function delete($key);
 

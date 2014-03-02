@@ -18,6 +18,10 @@ class Memcached extends Backend {
       return $this->memcached->set($key, $value, self::FLAGS, $expiration);
    }
 
+   public function add($key, $value, $expiration = 0) {
+      return $this->memcached->add($key, $value, self::FLAGS, $expiration);
+   }
+
    public function get($key) {
       $value = $this->memcached->get($key);
 

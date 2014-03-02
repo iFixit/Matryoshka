@@ -25,6 +25,15 @@ class Hierarchy extends Backend {
       return $success;
    }
 
+   public function add($key, $value, $expiration = 0) {
+      $success = true;
+      foreach ($this->backends as $backend) {
+         $success = $backend->add($key, $value, $expiration) && $success;
+      }
+
+      return $success;
+   }
+
    public function get($key) {
       for ($i = 0; $i < $this->backendCount; $i++) {
          $value = $this->backends[$i]->get($key);
