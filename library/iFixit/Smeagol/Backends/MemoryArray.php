@@ -18,7 +18,7 @@ class MemoryArray extends Smeagol\Backends\Backend {
       if (array_key_exists($key, $this->cache)) {
          return $this->cache[$key];
       } else {
-         return $this->miss();
+         return self::MISS;
       }
    }
 

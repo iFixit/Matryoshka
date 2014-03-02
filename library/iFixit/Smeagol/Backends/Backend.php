@@ -8,6 +8,8 @@ use iFixit\Smeagol;
  * Base class for cache backends.
  */
 abstract class Backend {
+   const MISS = null;
+
    public abstract function set($key, $value);
    public abstract function get($key);
    public abstract function delete($key);
@@ -21,9 +23,5 @@ abstract class Backend {
       }
 
       return $value;
-   }
-
-   public function miss() {
-      return null;
    }
 }
