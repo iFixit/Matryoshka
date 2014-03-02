@@ -22,7 +22,9 @@ class Enabled extends Backend {
 
    public function set($key, $value, $expiration = 0) {
       if ($this->setsEnabled) {
-         $this->backend->set($key, $value, $expiration);
+         return $this->backend->set($key, $value, $expiration);
+      } else {
+         return false;
       }
    }
 
@@ -36,7 +38,9 @@ class Enabled extends Backend {
 
    public function delete($key) {
       if ($this->deletesEnabled) {
-         $this->backend->delete($key);
+         return $this->backend->delete($key);
+      } else {
+         return false;
       }
    }
 }

@@ -14,7 +14,7 @@ abstract class KeyChanger extends Backend {
    }
 
    public function set($key, $value, $expiration = 0) {
-      $this->backend->set($this->changeKey($key), $value, $expiration);
+      return $this->backend->set($this->changeKey($key), $value, $expiration);
    }
 
    public function get($key) {
@@ -22,6 +22,6 @@ abstract class KeyChanger extends Backend {
    }
 
    public function delete($key) {
-      $this->backend->delete($this->changeKey($key));
+      return $this->backend->delete($this->changeKey($key));
    }
 }

@@ -35,8 +35,12 @@ class Scoped extends KeyChanger {
    }
 
    public function deleteScope() {
-      $this->backend->delete($this->getScopeKey());
-      $this->scopePrefix = null;
+      if ($this->backend->delete($this->getScopeKey())) {
+         $this->scopePrefix = null;
+         return true;
+      } else {
+         return false;
+      }
    }
 
    private function getScopeKey() {

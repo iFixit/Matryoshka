@@ -17,6 +17,8 @@ class MemoryArray extends Backend {
    public function set($key, $value, $expiration = 0) {
       // TODO: This doesn't use the expiration time at all.
       $this->cache[$key] = $value;
+
+      return true;
    }
 
    public function get($key) {
@@ -29,5 +31,7 @@ class MemoryArray extends Backend {
 
    public function delete($key) {
       unset($this->cache[$key]);
+
+      return true;
    }
 }

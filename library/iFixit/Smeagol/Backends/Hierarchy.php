@@ -17,9 +17,12 @@ class Hierarchy extends Backend {
    }
 
    public function set($key, $value, $expiration = 0) {
+      $success = true;
       foreach ($this->backends as $backend) {
-         $backend->set($key, $value, $expiration);
+         $success = $backend->set($key, $value, $expiration) && $success;
       }
+
+      return $success;
    }
 
    public function get($key) {
@@ -41,8 +44,11 @@ class Hierarchy extends Backend {
    }
 
    public function delete($key) {
+      $success = true;
       foreach ($this->backends as $backend) {
-         $backend->delete($key);
+         $success = $backend->delete($key) && $success;
       }
+
+      return $success;
    }
 }

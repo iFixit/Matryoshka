@@ -14,11 +14,11 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
       $this->assertNull($cache->get($key));
 
-      $cache->set($key, $value);
+      $this->assertTrue($cache->set($key, $value));
 
       $this->assertSame($value, $cache->get($key));
 
-      $cache->delete($key);
+      $this->assertTrue($cache->delete($key));
 
       $this->assertNull($cache->get($key));
    }
@@ -34,27 +34,27 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
       $this->assertNull($hierarchy->get($key));
 
-      $hierarchy->set($key, $value);
+      $this->assertTrue($hierarchy->set($key, $value));
 
       foreach ($allBackends as $backend) {
          $this->assertSame($value, $backend->get($key));
       }
 
-      $backends[0]->delete($key);
+      $this->assertTrue($backends[0]->delete($key));
 
       $this->assertSame($value, $hierarchy->get($key));
       $this->assertSame($value, $backends[0]->get($key));
 
-      $hierarchy->delete($key);
+      $this->assertTrue($hierarchy->delete($key));
 
       foreach ($allBackends as $backend) {
          $this->assertNull($backend->get($key));
       }
 
       list($key, $value) = $this->getRandomKeyValue();
-      $hierarchy->set($key, $value);
+      $this->assertTrue($hierarchy->set($key, $value));
 
-      $backends[1]->delete($key);
+      $this->assertTrue($backends[1]->delete($key));
       $this->assertSame($value, $hierarchy->get($key));
    }
 
@@ -67,13 +67,13 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
       $this->assertNull($prefixedCache->get($key));
 
-      $prefixedCache->set($key, $value);
+      $this->assertTrue($prefixedCache->set($key, $value));
 
       $this->assertSame($value, $prefixedCache->get($key));
       $this->assertSame($value, $memoryCache->get("{$prefix}{$key}"));
       $this->assertNull($memoryCache->get($key));
 
-      $prefixedCache->delete($key);
+      $this->assertTrue($prefixedCache->delete($key));
 
       $this->assertNull($prefixedCache->get($key));
       $this->assertNull($memoryCache->get("{$prefix}{$key}"));
@@ -90,26 +90,26 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
       $this->assertNull($scopedCache->get($key1));
 
-      $scopedCache->set($key1, $value1);
+      $this->assertTrue($scopedCache->set($key1, $value1));
 
       $this->assertSame($value1, $scopedCache->get($key1));
 
-      $scopedCache->delete($key1);
+      $this->assertTrue($scopedCache->delete($key1));
 
       $this->assertNull($scopedCache->get($key1));
 
-      $scopedCache->set($key1, $value1);
-      $scopedCache->set($key2, $value2);
+      $this->assertTrue($scopedCache->set($key1, $value1));
+      $this->assertTrue($scopedCache->set($key2, $value2));
 
       $this->assertSame($value1, $scopedCache->get($key1));
       $this->assertSame($value2, $scopedCache->get($key2));
 
-      $scopedCache->deleteScope();
+      $this->assertTrue($scopedCache->deleteScope());
 
       $this->assertNull($scopedCache->get($key1));
       $this->assertNull($scopedCache->get($key2));
 
-      $scopedCache->set($key1, $value1);
+      $this->assertTrue($scopedCache->set($key1, $value1));
 
       $this->assertSame($value1, $scopedCache->get($key1));
    }
@@ -120,16 +120,16 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
       $this->assertNull($cache->get($key));
 
-      $cache->set($key, $value);
+      $this->assertTrue($cache->set($key, $value));
 
       $this->assertSame($value, $cache->get($key));
 
-      $cache->delete($key);
+      $this->assertTrue($cache->delete($key));
 
       $this->assertNull($cache->get($key));
 
       list($key, $value) = $this->getRandomKeyValue();
-      $cache->set($key, $value, 1);
+      $this->assertTrue($cache->set($key, $value, 1));
       // Wait for it to expire.
       sleep(2);
 
@@ -141,11 +141,11 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       list($key, $value) = $this->getRandomKeyValue();
 
       $cache->setsEnabled = false;
-      $cache->set($key, $value);
+      $this->assertFalse($cache->set($key, $value));
       $this->assertNull($cache->get($key));
       $cache->setsEnabled = true;
 
-      $cache->set($key, $value);
+      $this->assertTrue($cache->set($key, $value));
       $this->assertSame($value, $cache->get($key));
 
       $cache->getsEnabled = false;
@@ -153,7 +153,7 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $cache->getsEnabled = true;
 
       $cache->deletesEnabled = false;
-      $cache->delete($key);
+      $this->assertFalse($cache->delete($key));
       $this->assertSame($value, $cache->get($key));
       $cache->deletesEnabled = true;
    }
