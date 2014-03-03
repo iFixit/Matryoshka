@@ -248,6 +248,49 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       }
    }
 
+   public function testdecrement() {
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+      foreach ($this->getAllBackends() as $type => $cache) {
+         $this->assertNull($cache->get($key1), $type);
+
+         // TODO: Memcached values cannot be decremented below 0 so we must
+         // start it out higher.
+         if ($type === 'Memcached') {
+            $currentValue = 400;
+            $cache->set($key1, $currentValue);
+         } else {
+            $currentValue = 0;
+         }
+         foreach ([1, 5, 100] as $amount) {
+            $currentValue -= $amount;
+            $this->assertSame($currentValue, $cache->decrement($key1, $amount),
+             "$type | $amount");
+         }
+
+         $this->assertSame($currentValue, $cache->get($key1), $type);
+
+         $this->assertTrue($cache->delete($key1));
+
+         // TODO: Memcached has some strange behavior with these values that
+         // doesn't appear to match the docs.
+         if ($type !== 'Memcached') {
+            $this->assertSame(-7, $cache->decrement($key1, 7), $type);
+
+            $invalidValues = [
+               'string',
+               ['array'],
+               (object)['object' => 'value']
+            ];
+            foreach ($invalidValues as $invalidValue) {
+               $this->assertTrue($cache->set($key2, $invalidValue), $type);
+               $this->assertSame(-1, $cache->decrement($key2), $type);
+               $this->assertSame(-1, $cache->get($key2), $type);
+            }
+         }
+      }
+   }
+
    public function testgetAndSet() {
       foreach ($this->getAllBackends() as $type => $cache) {
          list($key, $value) = $this->getRandomKeyValue();

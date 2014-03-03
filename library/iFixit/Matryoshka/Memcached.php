@@ -36,6 +36,12 @@ class Memcached extends Backend {
       }
    }
 
+   public function decrement($key, $amount = 1, $expiration = 0) {
+      // TODO: Memcached doesn't support decrementing under 0 so there isn't
+      // much we can do for the missing case.
+      return $this->memcached->decrement($key, $amount);
+   }
+
    public function get($key) {
       $value = $this->memcached->get($key);
 

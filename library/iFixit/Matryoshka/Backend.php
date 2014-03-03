@@ -28,7 +28,10 @@ abstract class Backend {
    /**
     * Increments the value associated with the given key by the given amount.
     * If the key does not exist or the existing value is not numeric, it is set
-    * to the given value instead.
+    * to the given value instead. Some backends have different rules for valid
+    * values and ranges.
+    *
+    * Also see: decrement
     *
     * @return the updated value, or false on failure
     */
@@ -63,5 +66,15 @@ abstract class Backend {
       }
 
       return $value;
+   }
+
+   /**
+    * Same as increment but subtracts the amount rather than adding it. Some
+    * backends have different rules for valid values and ranges.
+    *
+    * @return the updated value, or false on failure
+    */
+   public function decrement($key, $amount = 1, $expiration = 0) {
+      return $this->increment($key, -$amount, $expiration);
    }
 }
