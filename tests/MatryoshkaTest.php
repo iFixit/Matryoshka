@@ -196,6 +196,24 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       }
    }
 
+   public function testadd() {
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+      foreach ($this->getAllBackends() as $type => $cache) {
+         $this->assertTrue($cache->add($key1, $value1), $type);
+         $this->assertFalse($cache->add($key1, $value1), $type);
+         $this->assertSame($value1, $cache->get($key1), $type);
+         $this->assertTrue($cache->add($key2, $value2), $type);
+         $this->assertSame($value2, $cache->get($key2), $type);
+
+         $this->assertTrue($cache->delete($key1), $type);
+         $this->assertNull($cache->get($key1), $type);
+         $this->assertTrue($cache->add($key1, $value1), $type);
+         $this->assertSame($value1, $cache->get($key1), $type);
+         $this->assertSame($value2, $cache->get($key2), $type);
+      }
+   }
+
    public function testgetAndSet() {
       foreach ($this->getAllBackends() as $type => $cache) {
          list($key, $value) = $this->getRandomKeyValue();
