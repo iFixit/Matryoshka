@@ -34,6 +34,31 @@ class Hierarchy extends Backend {
       return $success;
    }
 
+   // TODO: This gets kinda awkward. This assumes that the last backend is the
+   // authoritative source of the value so the incremented value is set on all
+   // of the other backends but the results of those sets aren't verified. It
+   // also resets the expiration time.
+   public function increment($key, $amount = 1, $expiration = 0) {
+      if (empty($this->backends)) {
+         return false;
+      }
+
+      $numBackends = count($this->backends);
+      $lastBackend = $this->backends[$numBackends - 1];
+      $newValue = $lastBackend->increment($key, $amount, $expiration);
+
+      if ($newValue === false) {
+         return false;
+      }
+
+      // Set the value on all the other backends.
+      for ($i = 0; $i < $numBackends - 1; $i++) {
+         $this->backends[$i]->set($key, $newValue, $expiration);
+      }
+
+      return $newValue;
+   }
+
    public function get($key) {
       for ($i = 0; $i < $this->backendCount; $i++) {
          $value = $this->backends[$i]->get($key);

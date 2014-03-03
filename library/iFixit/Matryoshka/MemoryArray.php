@@ -31,6 +31,17 @@ class MemoryArray extends Backend {
       }
    }
 
+   public function increment($key, $amount = 1, $expiration = 0) {
+      if (array_key_exists($key, $this->cache) &&
+       is_numeric($this->cache[$key])) {
+         $this->cache[$key] += $amount;
+         return $this->cache[$key];
+      } else {
+         $this->cache[$key] = (int)$amount;
+         return $amount;
+      }
+   }
+
    public function get($key) {
       if (array_key_exists($key, $this->cache)) {
          return $this->cache[$key];

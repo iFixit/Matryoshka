@@ -10,6 +10,7 @@ use iFixit\Matryoshka;
 class Enabled extends Backend {
    private $backend;
    public $getsEnabled;
+   // TODO: Rename to writesEnabled because it covers more than just `set`?
    public $setsEnabled;
    public $deletesEnabled;
 
@@ -31,6 +32,14 @@ class Enabled extends Backend {
    public function add($key, $value, $expiration = 0) {
       if ($this->setsEnabled) {
          return $this->backend->add($key, $value, $expiration);
+      } else {
+         return false;
+      }
+   }
+
+   public function increment($key, $amount = 1, $expiration = 0) {
+      if ($this->setsEnabled) {
+         return $this->backend->increment($key, $amount, $expiration);
       } else {
          return false;
       }

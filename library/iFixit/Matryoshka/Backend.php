@@ -26,6 +26,15 @@ abstract class Backend {
    public abstract function add($key, $value, $expiration = 0);
 
    /**
+    * Increments the value associated with the given key by the given amount.
+    * If the key does not exist or the existing value is not numeric, it is set
+    * to the given value instead.
+    *
+    * @return the updated value, or false on failure
+    */
+   public abstract function increment($key, $amount = 1, $expiration = 0);
+
+   /**
     * Retrieves the value associated with the key.
     *
     * @return the value or null on failure or if it is not found

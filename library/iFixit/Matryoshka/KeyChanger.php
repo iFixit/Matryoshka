@@ -21,6 +21,11 @@ abstract class KeyChanger extends Backend {
       return $this->backend->add($this->changeKey($key), $value, $expiration);
    }
 
+   public function increment($key, $amount = 1, $expiration = 0) {
+      return $this->backend->increment($this->changeKey($key), $amount,
+       $expiration);
+   }
+
    public function get($key) {
       return $this->backend->get($this->changeKey($key));
    }
