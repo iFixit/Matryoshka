@@ -130,6 +130,42 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       $cache->deletesEnabled = true;
    }
 
+   public function testStats() {
+      $cache = new Matryoshka\Stats(new Matryoshka\MemoryArray());
+      list($key, $value) = $this->getRandomKeyValue();
+
+      foreach ($cache->getStats() as $stat => $value) {
+         $this->assertSame(0, $value, $stat);
+      }
+
+      $start = microtime(true);
+
+      $cache->add($key, $value);
+      $cache->set($key, 5);
+      $cache->increment($key, 1);
+      $cache->decrement($key, 1);
+      $cache->get($key);
+      $cache->delete($key, 1);
+
+      $end = microtime(true);
+      $maxTime = $end - $start;
+
+      foreach ($cache->getStats() as $stat => $value) {
+         if (strpos($stat, '_count') !== false) {
+            $this->assertSame(1, $value);
+         } else if (strpos($stat, '_time') !== false) {
+            $this->assertGreaterThan(0, $value);
+            $this->assertLessThan($maxTime, $value);
+         }
+      }
+
+      $cache->get($key);
+      $stats = $cache->getStats();
+
+      $this->assertSame(2, $stats['get_count']);
+      $this->assertSame(1, $stats['get_hit_count']);
+   }
+
    /**
     * It's hard to test them individually so we can just test all 3 at once.
     */
@@ -299,7 +335,8 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
          ]),
          'Memcached' => new Matryoshka\Memcached($this->getMemcached()),
          'Prefixed' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
-         'Scoped' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope')
+         'Scoped' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
+         'Stats' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
       ];
    }
 }
