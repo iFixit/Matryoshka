@@ -1,8 +1,8 @@
 {
-   "name": "iFixit/Smeagol",
+   "name": "iFixit/Matryoshka",
    "description": "PHP Caching Library",
    "keywords": ["cache", "memcached"],
-   "homepage": "https://github.com/iFixit/Smeagol",
+   "homepage": "https://github.com/iFixit/Matryoshka",
    "type": "library",
    "license": "MIT",
    "authors": [

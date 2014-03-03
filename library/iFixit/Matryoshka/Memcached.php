@@ -1,8 +1,8 @@
 <?php
 
-namespace iFixit\Smeagol\Backends;
+namespace iFixit\Matryoshka;
 
-use iFixit\Smeagol;
+use iFixit\Matryoshka;
 
 class Memcached extends Backend {
    const FLAGS = MEMCACHE_COMPRESSED;

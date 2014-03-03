@@ -2,11 +2,11 @@
 
 namespace iFixit;
 
-use iFixit\Smeagol;
+use iFixit\Matryoshka;
 
-class Smeagol {
+class Matryoshka {
    /**
-    * Setup autoloader for Smeagol library classes.
+    * Setup autoloader for Matryoshka library classes.
     */
    public static function autoload() {
       spl_autoload_register(function($class) {

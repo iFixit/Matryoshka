@@ -1,15 +1,14 @@
 <?php
 
-require_once __DIR__ . '/../library/iFixit/Smeagol.php';
+require_once __DIR__ . '/../library/iFixit/Matryoshka.php';
 
-use iFixit\Smeagol;
-use iFixit\Smeagol\Backends;
+use iFixit\Matryoshka;
 
-Smeagol::autoload();
+Matryoshka::autoload();
 
-class SmeagolTest extends PHPUnit_Framework_TestCase {
+class MatryoshkaTest extends PHPUnit_Framework_TestCase {
    public function testMemoryArray() {
-      $cache = new Backends\MemoryArray();
+      $cache = new Matryoshka\MemoryArray();
       list($key, $value) = $this->getRandomKeyValue();
 
       $this->assertNull($cache->get($key));
@@ -33,10 +32,10 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
    public function testHierarchy() {
       $backends = [
-         new Backends\MemoryArray(),
-         new Backends\Memcached($this->getMemcached())
+         new Matryoshka\MemoryArray(),
+         new Matryoshka\Memcached($this->getMemcached())
       ];
-      $hierarchy = new Backends\Hierarchy($backends);
+      $hierarchy = new Matryoshka\Hierarchy($backends);
       $allBackends = array_merge($backends, [$hierarchy]);
       list($key, $value) = $this->getRandomKeyValue();
 
@@ -67,9 +66,9 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testPrefixed() {
-      $memoryCache = new Backends\MemoryArray();
+      $memoryCache = new Matryoshka\MemoryArray();
       $prefix = 'prefix';
-      $prefixedCache = new Backends\Prefixed($memoryCache,
+      $prefixedCache = new Matryoshka\Prefixed($memoryCache,
        $prefix);
       list($key, $value) = $this->getRandomKeyValue();
 
@@ -89,9 +88,9 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testScoped() {
-      $memoryCache = new Backends\MemoryArray();
+      $memoryCache = new Matryoshka\MemoryArray();
       $scope = 'scope';
-      $scopedCache = new Backends\Scoped($memoryCache,
+      $scopedCache = new Matryoshka\Scoped($memoryCache,
        $scope);
       list($key1, $value1) = $this->getRandomKeyValue();
       list($key2, $value2) = $this->getRandomKeyValue();
@@ -123,7 +122,7 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testMemcached() {
-      $cache = new Backends\Memcached($this->getMemcached());
+      $cache = new Matryoshka\Memcached($this->getMemcached());
       list($key, $value) = $this->getRandomKeyValue();
 
       $this->assertNull($cache->get($key));
@@ -153,7 +152,7 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testEnabled() {
-      $cache = new Backends\Enabled(new Backends\MemoryArray());
+      $cache = new Matryoshka\Enabled(new Matryoshka\MemoryArray());
       list($key, $value) = $this->getRandomKeyValue();
 
       $cache->setsEnabled = false;
@@ -240,14 +239,14 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
 
    private function getAllBackends() {
       return [
-         'Enabled' => new Backends\Enabled(new Backends\MemoryArray()),
-         'Hierarchy' => new Backends\Hierarchy([
-            new Backends\MemoryArray(),
-            new Backends\MemoryArray()
+         'Enabled' => new Matryoshka\Enabled(new Matryoshka\MemoryArray()),
+         'Hierarchy' => new Matryoshka\Hierarchy([
+            new Matryoshka\MemoryArray(),
+            new Matryoshka\MemoryArray()
          ]),
-         'Memcached' => new Backends\Memcached($this->getMemcached()),
-         'Prefixed' => new Backends\Prefixed(new Backends\MemoryArray(), 'prefix'),
-         'Scoped' => new Backends\Scoped(new Backends\MemoryArray(), 'scope')
+         'Memcached' => new Matryoshka\Memcached($this->getMemcached()),
+         'Prefixed' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
+         'Scoped' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope')
       ];
    }
 }

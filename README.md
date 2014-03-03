@@ -1,4 +1,4 @@
-Smeagol
-======
+Matryoshka
+==========
 
-Caching library for PHP!
+A caching library for PHP built around nesting components.

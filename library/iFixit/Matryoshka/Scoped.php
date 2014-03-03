@@ -1,8 +1,8 @@
 <?php
 
-namespace iFixit\Smeagol\Backends;
+namespace iFixit\Matryoshka;
 
-use iFixit\Smeagol;
+use iFixit\Matryoshka;
 
 class Scoped extends KeyChanger {
    private $backend;
