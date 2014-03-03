@@ -7,29 +7,6 @@ use iFixit\Matryoshka;
 Matryoshka::autoload();
 
 class MatryoshkaTest extends PHPUnit_Framework_TestCase {
-   public function testMemoryArray() {
-      $cache = new Matryoshka\MemoryArray();
-      list($key, $value) = $this->getRandomKeyValue();
-
-      $this->assertNull($cache->get($key));
-
-      $this->assertTrue($cache->set($key, $value));
-
-      $this->assertSame($value, $cache->get($key));
-
-      $this->assertTrue($cache->delete($key));
-
-      $this->assertNull($cache->get($key));
-
-
-      list($key1, $value1) = $this->getRandomKeyValue();
-      list($key2, $value2) = $this->getRandomKeyValue();
-      $this->assertTrue($cache->add($key1, $value1));
-      $this->assertSame($value1, $cache->get($key1));
-      $this->assertFalse($cache->add($key1, $value2));
-      $this->assertSame($value1, $cache->get($key1));
-   }
-
    public function testHierarchy() {
       $backends = [
          new Matryoshka\MemoryArray(),
@@ -124,31 +101,11 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
    public function testMemcached() {
       $cache = new Matryoshka\Memcached($this->getMemcached());
       list($key, $value) = $this->getRandomKeyValue();
-
-      $this->assertNull($cache->get($key));
-
-      $this->assertTrue($cache->set($key, $value));
-
-      $this->assertSame($value, $cache->get($key));
-
-      $this->assertTrue($cache->delete($key));
-
-      $this->assertNull($cache->get($key));
-
-      list($key, $value) = $this->getRandomKeyValue();
       $this->assertTrue($cache->set($key, $value, 1));
       // Wait for it to expire.
       sleep(2);
 
       $this->assertNull($cache->get($key));
-
-
-      list($key1, $value1) = $this->getRandomKeyValue();
-      list($key2, $value2) = $this->getRandomKeyValue();
-      $this->assertTrue($cache->add($key1, $value1));
-      $this->assertSame($value1, $cache->get($key1));
-      $this->assertFalse($cache->add($key1, $value2));
-      $this->assertSame($value1, $cache->get($key1));
    }
 
    public function testEnabled() {
