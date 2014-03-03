@@ -40,8 +40,11 @@ class MemoryArray extends Backend {
    }
 
    public function delete($key) {
-      unset($this->cache[$key]);
-
-      return true;
+      if (array_key_exists($key, $this->cache)) {
+         unset($this->cache[$key]);
+         return true;
+      } else {
+         return false;
+      }
    }
 }

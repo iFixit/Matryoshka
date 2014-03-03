@@ -174,36 +174,60 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $cache->deletesEnabled = true;
    }
 
+   /**
+    * It's hard to test them individually so we can just test all 3 at once.
+    */
+   public function testgetSetDelete() {
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+      list($key3, $value3) = $this->getRandomKeyValue();
+      foreach ($this->getAllBackends() as $type => $cache) {
+         $this->assertNull($cache->get($key1), $type);
+         $this->assertTrue($cache->set($key1, $value1), $type);
+         $this->assertSame($value1, $cache->get($key1), $type);
+         $this->assertTrue($cache->set($key1, $value1), $type);
+         $this->assertTrue($cache->delete($key1), $type);
+         $this->assertFalse($cache->delete($key1), $type);
+         $this->assertNull($cache->get($key1), $type);
+
+         $this->assertTrue($cache->set($key2, $value2), $type);
+         $this->assertTrue($cache->set($key3, $value3), $type);
+         $this->assertSame($value2, $cache->get($key2), $type);
+         $this->assertSame($value3, $cache->get($key3), $type);
+      }
+   }
+
    public function testgetAndSet() {
-      $cache = new Backends\MemoryArray();
-      list($key, $value) = $this->getRandomKeyValue();
+      foreach ($this->getAllBackends() as $type => $cache) {
+         list($key, $value) = $this->getRandomKeyValue();
 
-      $this->assertNull($cache->get($key));
+         $this->assertNull($cache->get($key), $type);
 
-      $hit = false;
-      $callback = function() use ($value, &$hit) {
-         $hit = true;
-         return $value;
-      };
+         $hit = false;
+         $callback = function() use ($value, &$hit) {
+            $hit = true;
+            return $value;
+         };
 
-      $getAndSetValue = $cache->getAndSet($key, $callback);
+         $getAndSetValue = $cache->getAndSet($key, $callback);
 
-      $this->assertTrue($hit);
-      $this->assertSame($value, $getAndSetValue);
-      $this->assertSame($value, $cache->get($key));
+         $this->assertTrue($hit, $type);
+         $this->assertSame($value, $getAndSetValue, $type);
+         $this->assertSame($value, $cache->get($key), $type);
 
-      $hit = false;
-      $getAndSetValue = $cache->getAndSet($key, $callback);
+         $hit = false;
+         $getAndSetValue = $cache->getAndSet($key, $callback);
 
-      $this->assertFalse($hit);
-      $this->assertSame($value, $getAndSetValue);
-      $this->assertSame($value, $cache->get($key));
+         $this->assertFalse($hit, $type);
+         $this->assertSame($value, $getAndSetValue, $type);
+         $this->assertSame($value, $cache->get($key), $type);
+      }
    }
 
    private function getRandomKeyValue() {
       return [
-         'key-' . microtime(true) * 100,
-         'value-' . microtime(true) * 100
+         'key-' . rand(),
+         'value-' . rand()
       ];
    }
 
@@ -212,5 +236,18 @@ class SmeagolTest extends PHPUnit_Framework_TestCase {
       $memcache->pconnect('localhost', 11211);
 
       return $memcache;
+   }
+
+   private function getAllBackends() {
+      return [
+         'Enabled' => new Backends\Enabled(new Backends\MemoryArray()),
+         'Hierarchy' => new Backends\Hierarchy([
+            new Backends\MemoryArray(),
+            new Backends\MemoryArray()
+         ]),
+         'Memcached' => new Backends\Memcached($this->getMemcached()),
+         'Prefixed' => new Backends\Prefixed(new Backends\MemoryArray(), 'prefix'),
+         'Scoped' => new Backends\Scoped(new Backends\MemoryArray(), 'scope')
+      ];
    }
 }

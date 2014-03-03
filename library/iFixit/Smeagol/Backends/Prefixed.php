@@ -14,6 +14,6 @@ class Prefixed extends KeyChanger {
    }
 
    public function changeKey($key) {
-      return "{$this->prefix}$key";
+      return $this->prefix . $key;
    }
 }
