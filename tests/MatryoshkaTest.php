@@ -232,7 +232,8 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
          $this->assertSame(7, $cache->increment($key1, 7), $type);
 
          // TODO: Memcached has some strange behavior with these values that
-         // doesn't appear to match the docs.
+         // doesn't appear to match the docs. It might have to do with
+         // compression.
          if ($type !== 'Memcached') {
             $invalidValues = [
                'string',

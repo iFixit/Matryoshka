@@ -29,7 +29,8 @@ class Memcached extends Backend {
          return $result;
       }
 
-      if ($this->memcached->set($key, $amount, $expiration) !== false) {
+      if ($this->memcached->set($key, $amount, self::FLAGS, $expiration) !==
+       false) {
          return $amount;
       } else {
          return false;
