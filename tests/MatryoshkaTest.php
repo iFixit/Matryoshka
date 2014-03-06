@@ -10,7 +10,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
    public function testHierarchy() {
       $backends = [
          new Matryoshka\MemoryArray(),
-         new Matryoshka\Memcached($this->getMemcached())
+         new Matryoshka\Memcache($this->getMemcached())
       ];
       $hierarchy = new Matryoshka\Hierarchy($backends);
       $allBackends = array_merge($backends, [$hierarchy]);
@@ -99,7 +99,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testMemcached() {
-      $cache = new Matryoshka\Memcached($this->getMemcached());
+      $cache = new Matryoshka\Memcache($this->getMemcached());
       list($key, $value) = $this->getRandomKeyValue();
       $this->assertTrue($cache->set($key, $value, 1));
       // Wait for it to expire.
@@ -333,7 +333,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
             new Matryoshka\MemoryArray(),
             new Matryoshka\MemoryArray()
          ]),
-         'Memcached' => new Matryoshka\Memcached($this->getMemcached()),
+         'Memcached' => new Matryoshka\Memcache($this->getMemcached()),
          'Prefixed' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
          'Scoped' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
          'Stats' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
