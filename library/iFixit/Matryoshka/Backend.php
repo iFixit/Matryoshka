@@ -45,6 +45,23 @@ abstract class Backend {
    public abstract function get($key);
 
    /**
+    * Retrieves multiple keys/values.
+    *
+    * @param $keys An array of [key => id] where id is whatever the caller
+    *              wants to use to identify the missed values.
+    *
+    * @return An array of found and missed values e.g.
+    *         [
+    *            [key => value],
+    *            [key => id]
+    *         ]
+    *         The first array contains all of the provided keys in the same
+    *         order. Any values not in the cache are returned as null in the
+    *         found array and have the same id in the missing array.
+    */
+   public abstract function getMultiple(array $keys);
+
+   /**
     * Deletes the cache entry with the given key.
     *
     * @return true on success, false on failure

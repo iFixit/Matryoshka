@@ -50,6 +50,22 @@ class MemoryArray extends Backend {
       }
    }
 
+   public function getMultiple(array $keys) {
+      $found = [];
+      $missing = [];
+
+      foreach ($keys as $key => $id) {
+         if (array_key_exists($key, $this->cache)) {
+            $found[$key] = $this->cache[$key];
+         } else {
+            $found[$key] = self::MISS;
+            $missing[$key] = $id;
+         }
+      }
+
+      return [$found, $missing];
+   }
+
    public function delete($key) {
       if (array_key_exists($key, $this->cache)) {
          unset($this->cache[$key]);

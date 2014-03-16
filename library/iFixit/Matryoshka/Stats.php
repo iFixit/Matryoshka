@@ -25,6 +25,10 @@ class Stats extends Backend {
          'get_count' => 0,
          'get_hit_count' => 0,
          'get_time' => 0,
+         'getMultiple_count' => 0,
+         'getMultiple_key_count' => 0,
+         'getMultiple_hit_count' => 0,
+         'getMultiple_time' => 0,
          'delete_count' => 0,
          'delete_time' => 0
       ];
@@ -89,6 +93,21 @@ class Stats extends Backend {
       if ($value !== self::MISS) {
          $this->stats['get_hit_count']++;
       }
+
+      return $value;
+   }
+
+   public function getMultiple(array $keys) {
+      $start = microtime(true);
+      $value = $this->backend->getMultiple($keys);
+      $end = microtime(true);
+
+      $keyCount = count($keys);
+      $missCount = count($value[1]);
+      $this->stats['getMultiple_count']++;
+      $this->stats['getMultiple_key_count'] += $keyCount;
+      $this->stats['getMultiple_time'] += $end - $start;
+      $this->stats['getMultiple_hit_count'] += $keyCount - $missCount;
 
       return $value;
    }

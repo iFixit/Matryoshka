@@ -53,6 +53,14 @@ class Enabled extends Backend {
       }
    }
 
+   public function getMultiple(array $keys) {
+      if ($this->getsEnabled) {
+         return $this->backend->getMultiple($keys);
+      } else {
+         return [[], $keys];
+      }
+   }
+
    public function delete($key) {
       if ($this->deletesEnabled) {
          return $this->backend->delete($key);

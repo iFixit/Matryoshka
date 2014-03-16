@@ -77,6 +77,34 @@ class Hierarchy extends Backend {
       return $value;
    }
 
+   public function getMultiple(array $keys) {
+      $missed = $keys;
+      $found = [];
+
+      for ($i = 0; $i < $this->backendCount; $i++) {
+         list($newFound, $missed) = $this->backends[$i]->getMultiple($missed);
+
+         // Set the found elements in the earlier backends.
+         for ($j = 0; $j < $i; $j++) {
+            // TODO: Make setMultiple.
+            foreach ($newFound as $key => $value) {
+               if ($value !== self::MISS) {
+                  // TODO: This doesn't have an expiration time.
+                  $this->backends[$j]->set($key, $value);
+               }
+            }
+         }
+
+         $found = array_merge($found, $newFound);
+
+         if (empty($missed)) {
+            break;
+         }
+      }
+
+      return [$found, $missed];
+   }
+
    public function delete($key) {
       $success = true;
       foreach ($this->backends as $backend) {

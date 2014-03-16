@@ -133,6 +133,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
    public function testStats() {
       $cache = new Matryoshka\Stats(new Matryoshka\MemoryArray());
       list($key, $value) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
 
       foreach ($cache->getStats() as $stat => $value) {
          $this->assertSame(0, $value, $stat);
@@ -145,17 +146,20 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       $cache->increment($key, 1);
       $cache->decrement($key, 1);
       $cache->get($key);
-      $cache->delete($key, 1);
+      $cache->getMultiple([$key => '', $key2 => '']);
+      $cache->delete($key);
 
       $end = microtime(true);
       $maxTime = $end - $start;
 
       foreach ($cache->getStats() as $stat => $value) {
-         if (strpos($stat, '_count') !== false) {
-            $this->assertSame(1, $value);
+         if ($stat == 'getMultiple_key_count') {
+            $this->assertSame(2, $value, $stat);
+         } else if (strpos($stat, '_count') !== false) {
+            $this->assertSame(1, $value, $stat);
          } else if (strpos($stat, '_time') !== false) {
-            $this->assertGreaterThan(0, $value);
-            $this->assertLessThan($maxTime, $value);
+            $this->assertGreaterThan(0, $value, $stat);
+            $this->assertLessThan($maxTime, $value, $stat);
          }
       }
 
@@ -186,6 +190,46 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
          $this->assertTrue($cache->set($key3, $value3), $type);
          $this->assertSame($value2, $cache->get($key2), $type);
          $this->assertSame($value3, $cache->get($key3), $type);
+      }
+   }
+
+   public function testgetMultiple() {
+      list($key1, $value1, $id1) = $this->getRandomKeyValueId();
+      list($key2, $value2, $id2) = $this->getRandomKeyValueId();
+      list($key3, $value3, $id3) = $this->getRandomKeyValueId();
+      list($key4, $value4, $id4) = $this->getRandomKeyValueId();
+      foreach ($this->getAllBackends() as $type => $cache) {
+         list($found, $missed) = $cache->getMultiple([]);
+         $this->assertEmpty($found, $type);
+         $this->assertEmpty($missed, $type);
+
+         $keys = [
+            $key1 => $id1,
+            $key2 => $id2,
+            $key3 => $id3,
+            $key4 => $id4
+         ];
+         list($found, $missed) = $cache->getMultiple($keys);
+         $this->assertEmpty(array_filter($found), $type);
+         $this->assertSame(array_keys($keys), array_keys($found), $type);
+         $this->assertSame($keys, $missed, $type);
+
+         $cache->set($key1, $value1);
+         $cache->set($key2, $value2);
+         $expectedFound = [$key1 => $value1, $key2 => $value2, $key3 => null,
+          $key4 => null];
+         $expectedMissed = [$key3 => $id3, $key4 => $id4];
+         list($found, $missed) = $cache->getMultiple($keys);
+         $this->assertSame($found, $expectedFound, $type);
+         $this->assertSame($missed, $expectedMissed, $type);
+
+         $cache->set($key3, $value3);
+         $cache->set($key4, $value4);
+         $expectedFound = [$key1 => $value1, $key2 => $value2, $key3 => $value3,
+          $key4 => $value4];
+         list($found, $missed) = $cache->getMultiple($keys);
+         $this->assertSame($expectedFound, $found, $type);
+         $this->assertEmpty($missed, $type);
       }
    }
 
@@ -319,7 +363,15 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       ];
    }
 
-   private function getMemcached() {
+   private function getRandomKeyValueId() {
+      return [
+         'key-' . rand(),
+         'value-' . rand(),
+         'id-' . rand()
+      ];
+   }
+
+   private function getMemcache() {
       $memcache = new Memcache();
       $memcache->pconnect('localhost', 11211);
 

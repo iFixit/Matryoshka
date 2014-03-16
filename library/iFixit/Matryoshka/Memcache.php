@@ -48,6 +48,23 @@ class Memcache extends Backend {
       return $value === false ? self::MISS : $value;
    }
 
+   public function getMultiple(array $keys) {
+      $hits = $this->memcache->get(array_keys($keys));
+
+      $found = [];
+      $missed = [];
+      foreach ($keys as $key => $id) {
+         $value = array_key_exists($key, $hits) ? $hits[$key] : self::MISS;
+         $found[$key] = $value;
+
+         if ($value === self::MISS) {
+            $missed[$key] = $id;
+         }
+      }
+
+      return [$found, $missed];
+   }
+
    public function delete($key) {
       return $this->memcache->delete($key);
    }
