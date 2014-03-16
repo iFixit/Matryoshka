@@ -10,7 +10,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
    public function testHierarchy() {
       $backends = [
          new Matryoshka\MemoryArray(),
-         new Matryoshka\Memcache($this->getMemcached())
+         new Matryoshka\Memcache($this->getMemcache())
       ];
       $hierarchy = new Matryoshka\Hierarchy($backends);
       $allBackends = array_merge($backends, [$hierarchy]);
@@ -98,8 +98,8 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($value1, $scopedCache->get($key1));
    }
 
-   public function testMemcached() {
-      $cache = new Matryoshka\Memcache($this->getMemcached());
+   public function testMemcache() {
+      $cache = new Matryoshka\Memcache($this->getMemcache());
       list($key, $value) = $this->getRandomKeyValue();
       $this->assertTrue($cache->set($key, $value, 1));
       // Wait for it to expire.
@@ -268,10 +268,10 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
          $this->assertTrue($cache->delete($key1));
          $this->assertSame(7, $cache->increment($key1, 7), $type);
 
-         // TODO: Memcached has some strange behavior with these values that
+         // TODO: Memcache has some strange behavior with these values that
          // doesn't appear to match the docs. It might have to do with
          // compression.
-         if ($type !== 'Memcached') {
+         if ($type !== 'Memcache') {
             $invalidValues = [
                'string',
                ['array'],
@@ -292,9 +292,9 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       foreach ($this->getAllBackends() as $type => $cache) {
          $this->assertNull($cache->get($key1), $type);
 
-         // TODO: Memcached values cannot be decremented below 0 so we must
+         // TODO: Memcache values cannot be decremented below 0 so we must
          // start it out higher.
-         if ($type === 'Memcached') {
+         if ($type === 'Memcache') {
             $currentValue = 400;
             $cache->set($key1, $currentValue);
          } else {
@@ -310,9 +310,9 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
 
          $this->assertTrue($cache->delete($key1));
 
-         // TODO: Memcached has some strange behavior with these values that
+         // TODO: Memcache has some strange behavior with these values that
          // doesn't appear to match the docs.
-         if ($type !== 'Memcached') {
+         if ($type !== 'Memcache') {
             $this->assertSame(-7, $cache->decrement($key1, 7), $type);
 
             $invalidValues = [
@@ -385,7 +385,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
             new Matryoshka\MemoryArray(),
             new Matryoshka\MemoryArray()
          ]),
-         'Memcached' => new Matryoshka\Memcache($this->getMemcached()),
+         'Memcache' => new Matryoshka\Memcache($this->getMemcache()),
          'Prefixed' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
          'Scoped' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
          'Stats' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
