@@ -386,6 +386,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
             new Matryoshka\MemoryArray()
          ]),
          'Memcache' => new Matryoshka\Memcache($this->getMemcache()),
+         'MemoryArray' => new Matryoshka\MemoryArray(),
          'Prefixed' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
          'Scoped' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
          'Stats' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
