@@ -356,6 +356,98 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       }
    }
 
+   public function testgetAndSetMultiple() {
+      foreach ($this->getAllBackends() as $type => $cache) {
+         list($key1, $value1, $id1) = $this->getRandomKeyValueId();
+         list($key2, $value2, $id2) = $this->getRandomKeyValueId();
+         list($key3, $value3, $id3) = $this->getRandomKeyValueId();
+         list($key4, $value4, $id4) = $this->getRandomKeyValueId();
+         $keys = [
+            $key1 => $id1,
+            $key2 => $id2,
+            $key3 => $id3,
+            $key4 => $id4
+         ];
+         $keyToValue = [
+            $key1 => $value1,
+            $key2 => $value2,
+            $key3 => $value3,
+            $key4 => $value4
+         ];
+         $numMisses = -1;
+         $callback = function($missing) use ($keyToValue, $type, &$numMisses) {
+            $this->assertNotEmpty($missing, $type);
+            $numMisses = count($missing);
+
+            $result = [];
+
+            foreach ($missing as $key => $id) {
+               $result[$key] = $keyToValue[$key];
+            }
+
+            return $result;
+         };
+
+         $this->assertSame($keyToValue,
+          $cache->getAndSetMultiple($keys, $callback), $type);
+         $this->assertSame(count($keyToValue), $numMisses, $type);
+
+         $numMisses = -1;
+         $this->assertSame($keyToValue,
+          $cache->getAndSetMultiple($keys, $callback), $type);
+         $this->assertSame(-1, $numMisses, $type);
+
+         $cache->delete($key2);
+         $cache->delete($key3);
+         $this->assertSame($keyToValue,
+          $cache->getAndSetMultiple($keys, $callback), $type);
+         $this->assertSame(2, $numMisses, $type);
+
+         $numMisses = -1;
+         $this->assertSame($keyToValue,
+          $cache->getAndSetMultiple($keys, $callback), $type);
+         $this->assertSame(-1, $numMisses, $type);
+
+         $emptyCallbacks = [
+            'empty' => function($missing) use (&$numMisses) {
+               $numMisses = count($missing);
+               return [];
+            },
+            'invalid values' => function($missing) use (&$numMisses) {
+               $numMisses = count($missing);
+               list($key1, $value1) = $this->getRandomKeyValue();
+               list($key2, $value2) = $this->getRandomKeyValue();
+
+               return [
+                  $key1 => $value1,
+                  $key2 => $value2
+               ];
+            }
+         ];
+
+         foreach ($emptyCallbacks as $type => $emptyCallback) {
+            list($key1, $value1, $id1) = $this->getRandomKeyValueId();
+            list($key2, $value2, $id2) = $this->getRandomKeyValueId();
+            list($key3, $value3, $id3) = $this->getRandomKeyValueId();
+            $keys = [
+               $key1 => $id1,
+               $key2 => $id2,
+               $key3 => $id3
+            ];
+
+            $numMisses = -1;
+            $result = $cache->getAndSetMultiple($keys, $emptyCallback);
+            $this->assertEmpty($result, $type);
+            $this->assertSame(count($keys), $numMisses, $type);
+
+            // Make sure the false keys aren't set.
+            foreach ($keys as $key => $id) {
+               $this->assertNull($cache->get($key), $type);
+            }
+         }
+      }
+   }
+
    private function getRandomKeyValue() {
       return [
          'key-' . rand(),

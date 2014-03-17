@@ -47,6 +47,8 @@ abstract class Backend {
    /**
     * Retrieves multiple keys/values.
     *
+    * Note: It is recommended to use getAndSetMultiple instead.
+    *
     * @param $keys An array of [key => id] where id is whatever the caller
     *              wants to use to identify the missed values.
     *
@@ -83,6 +85,48 @@ abstract class Backend {
       }
 
       return $value;
+   }
+
+   /**
+    * Wrapper around getMultiple that uses the provided callback to retrieve
+    * and populate the cache for any misses.
+    *
+    * @param callback
+    *           @param missing Array of [key => id] that the caller needs to
+    *                          generate the values for.
+    *           @return Array of [key => value] for the found values. The
+    *                   order does not matter. Additional key/values in the
+    *                   array that are not in the missing array are ignored.
+    * @return Array of [key => value] in the same order as the requested keys.
+    *         This does not include values not returned by the callback.
+    */
+   public function getAndSetMultiple(array $keys, callable $callback,
+    $expiration = 0) {
+      list($found, $missing) = $this->getMultiple($keys);
+
+      if (empty($missing)) {
+         return $found;
+      }
+
+      $values = $callback($missing);
+
+      foreach ($values as $key => $value) {
+         // Ignore keys that weren't originally requested or are misses.
+         // TODO: setMultiple?
+         if (array_key_exists($key, $keys) && $value !== self::MISS) {
+            $found[$key] = $value;
+            $this->set($key, $value, $expiration);
+         }
+      }
+
+      // Remove misses.
+      foreach ($found as $key => $value) {
+         if ($value === self::MISS) {
+            unset($found[$key]);
+         }
+      }
+
+      return $found;
    }
 
    /**
