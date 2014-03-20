@@ -12,6 +12,14 @@ MatrysohkaBenchmark::run();
  * Runs various benchmarks on various Backends.
  */
 class MatrysohkaBenchmark {
+   // See displayHelp() for more info.
+   private static $options = [
+      'benchmark' => null,
+      'backend' => null,
+      'count' => 1000,
+      'help' => null
+   ];
+
    private static function benchmarkGetIncrementalKeys(
     Matryoshka\Backend $cache, $count) {
       for ($i = 0; $i < $count; $i++) {
@@ -50,13 +58,17 @@ class MatrysohkaBenchmark {
    }
 
    public static function run() {
-      $count = 1000;
+      $options = self::getOptions();
+      $count = $options['count'];
+      $benchmarkRegex = $options['benchmark'];
+      $backendRegex = $options['backend'];
+
       $allResults = [];
-      $benchmarkMethods = self::getBenchmarkMethods();
+      $benchmarkMethods = self::getBenchmarkMethods($benchmarkRegex);
 
       foreach ($benchmarkMethods as $method) {
          $benchmarkResults = [];
-         $backends = self::getTestBackends();
+         $backends = self::getTestBackends($backendRegex);
 
          foreach ($backends as $type => $cache) {
             $setupMethodName = "{$method}Setup";
@@ -80,6 +92,21 @@ class MatrysohkaBenchmark {
       }
 
       self::outputResults($results);
+   }
+
+   private static function getOptions() {
+      $availableOptions = [];
+      foreach (self::$options as $option => $default) {
+         $availableOptions[] = "{$option}::";
+      }
+
+      $options = getopt('', $availableOptions);
+
+      if (array_key_exists('help', $options)) {
+         self::displayHelp();
+      }
+
+      return array_merge(self::$options, $options);
    }
 
    private static function outputResults($results) {
@@ -115,8 +142,8 @@ class MatrysohkaBenchmark {
       return $disabled;
    }
 
-   private static function getTestBackends() {
-      return [
+   private static function getTestBackends($regex) {
+      $allBackends = [
          'EnabledMemoryArray' => new Matryoshka\Enabled(new Matryoshka\MemoryArray()),
          'DisabledMemoryArray' => self::getDisabled(new Matryoshka\MemoryArray()),
          'MemoryArrayHierarchy' => new Matryoshka\Hierarchy([
@@ -132,20 +159,45 @@ class MatrysohkaBenchmark {
          'ScopedMemoryArray' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
          'StatsMemoryArray' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
       ];
+
+      if ($regex !== null) {
+         foreach ($allBackends as $type => $backend) {
+            if (!preg_match("/$regex/i", $type)) {
+               unset($allBackends[$type]);
+            }
+         }
+      }
+
+      return $allBackends;
    }
 
-   private static function getBenchmarkMethods() {
+   private static function getBenchmarkMethods($regex) {
       $class = new ReflectionClass('MatrysohkaBenchmark');
       $methods = $class->getMethods();
       $benchmarkMethods = [];
 
       foreach ($methods as $method) {
          if (preg_match('/^benchmark/', $method->name) &&
-             !preg_match('/Setup$/', $method->name)) {
+             !preg_match('/Setup$/', $method->name) && (
+             $regex === null || preg_match("/$regex/i", $method->name))) {
             $benchmarkMethods[] = $method->name;
          }
       }
 
       return $benchmarkMethods;
+   }
+
+   private static function displayHelp() {
+      echo <<<HELP
+Runs benchmarks on backends to investigate performance overhead of different
+backends.
+
+   --backend=<regex> Filters backends based on the regex.
+
+   --benchmark=<regex> Filters benchmarks based on the regex.
+
+   --count=<count> Number of operations to perform/benchmark/backend.
+HELP;
+      exit(0);
    }
 }
