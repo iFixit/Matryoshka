@@ -30,10 +30,22 @@ class MatrysohkaBenchmark {
     $count) {
       $cache->set('testkey', 'testval');
    }
-   private static function benchmarkHits(
-    Matryoshka\Backend $cache, $count) {
+   private static function benchmarkHits(Matryoshka\Backend $cache, $count) {
       for ($i = 0; $i < $count; $i++) {
          $cache->get('testkey');
+      }
+   }
+
+   private static function benchmarkHalfHitsSetup(Matryoshka\Backend $cache,
+    $count) {
+      for ($i = 0; $i < $count; $i += 2) {
+         $cache->set("halfHits{$i}");
+      }
+   }
+   private static function benchmarkHalfHits(Matryoshka\Backend $cache,
+    $count) {
+      for ($i = 0; $i < $count; $i++) {
+         $cache->get("halfHits{$i}");
       }
    }
 
