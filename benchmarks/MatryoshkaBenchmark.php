@@ -19,6 +19,13 @@ class MatrysohkaBenchmark {
       }
    }
 
+   private static function benchmarkSetIncrementalKeys(
+    Matryoshka\Backend $cache, $count) {
+      for ($i = 0; $i < $count; $i++) {
+         $cache->set("key-$i", "value-$i");
+      }
+   }
+
    public static function run() {
       $count = 1000;
       $allResults = [];
@@ -55,6 +62,13 @@ class MatrysohkaBenchmark {
             return ($result1['msPerCall'] - $result2['msPerCall']) * 10000;
          });
       } unset($benchmarkResults);
+
+      uasort($results, function($benchmark1, $benchmark2) {
+         // Reset returns the first element of the array.
+         return (reset($benchmark1)['msPerCall'] -
+          reset($benchmark2)['msPerCall']) * 10000;
+      });
+
       echo json_encode($results, JSON_PRETTY_PRINT);
    }
 
