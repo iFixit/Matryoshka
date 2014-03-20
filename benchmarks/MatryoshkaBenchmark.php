@@ -26,6 +26,17 @@ class MatrysohkaBenchmark {
       }
    }
 
+   private static function benchmarkHitsSetup(Matryoshka\Backend $cache,
+    $count) {
+      $cache->set('testkey', 'testval');
+   }
+   private static function benchmarkHits(
+    Matryoshka\Backend $cache, $count) {
+      for ($i = 0; $i < $count; $i++) {
+         $cache->get('testkey');
+      }
+   }
+
    public static function run() {
       $count = 1000;
       $allResults = [];
@@ -36,6 +47,10 @@ class MatrysohkaBenchmark {
          $backends = self::getTestBackends();
 
          foreach ($backends as $type => $cache) {
+            $setupMethodName = "{$method}Setup";
+            if (method_exists('self', $setupMethodName)) {
+               self::$setupMethodName($cache, $count);
+            }
             $start = microtime(true);
             self::$method($cache, $count);
             $end = microtime(true);
@@ -113,7 +128,8 @@ class MatrysohkaBenchmark {
       $benchmarkMethods = [];
 
       foreach ($methods as $method) {
-         if (strpos($method->name, 'benchmark') === 0) {
+         if (preg_match('/^benchmark/', $method->name) &&
+             !preg_match('/Setup$/', $method->name)) {
             $benchmarkMethods[] = $method->name;
          }
       }
