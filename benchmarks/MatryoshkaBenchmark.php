@@ -16,7 +16,7 @@ class MatrysohkaBenchmark {
    private static $options = [
       'benchmark' => null,
       'backend' => null,
-      'count' => 1000,
+      'count' => 10000,
       'help' => null
    ];
 
@@ -123,7 +123,26 @@ class MatrysohkaBenchmark {
           reset($benchmark2)['msPerCall']) * 10000;
       });
 
-      echo json_encode($results, JSON_PRETTY_PRINT);
+      $benchmarkWidth = 20;
+      $backendWidth = 20;
+      $first = true;
+      foreach ($results as $benchmark => $benchmarkResults) {
+         if ($first) {
+            $first = false;
+            printf("% {$benchmarkWidth}s", '');
+            foreach ($benchmarkResults as $backend => $_) {
+               printf("% {$backendWidth}s", $backend);
+            }
+            echo "\n";
+         }
+
+         $benchmark = str_replace('benchmark', '', $benchmark);
+         printf("% {$benchmarkWidth}s", $benchmark);
+         foreach ($benchmarkResults as $backendResults) {
+            printf("% {$backendWidth}f", $backendResults['msPerCall']);
+         }
+         echo "\n";
+      }
    }
 
    private static function getMemcache() {
@@ -144,20 +163,20 @@ class MatrysohkaBenchmark {
 
    private static function getTestBackends($regex) {
       $allBackends = [
-         'EnabledMemoryArray' => new Matryoshka\Enabled(new Matryoshka\MemoryArray()),
-         'DisabledMemoryArray' => self::getDisabled(new Matryoshka\MemoryArray()),
-         'MemoryArrayHierarchy' => new Matryoshka\Hierarchy([
+         'EnabledMemArray' => new Matryoshka\Enabled(new Matryoshka\MemoryArray()),
+         'DisabledMemArray' => self::getDisabled(new Matryoshka\MemoryArray()),
+         'MemArrayHierarchy' => new Matryoshka\Hierarchy([
             new Matryoshka\MemoryArray()
          ]),
-         'MemoryArrayMemcacheHierarchy' => new Matryoshka\Hierarchy([
+         'MemArrayMemcacheHier' => new Matryoshka\Hierarchy([
             new Matryoshka\MemoryArray(),
             self::getMemcache()
          ]),
          'Memcache' => new Matryoshka\Memcache(self::getMemcache()),
-         'MemoryArray' => new Matryoshka\MemoryArray(),
-         'PrefixedMemoryArray' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
-         'ScopedMemoryArray' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
-         'StatsMemoryArray' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
+         'MemArray' => new Matryoshka\MemoryArray(),
+         'PrefixedMemArray' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
+         'ScopedMemArray' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
+         'StatsMemArray' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
       ];
 
       if ($regex !== null) {
