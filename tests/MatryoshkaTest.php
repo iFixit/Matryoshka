@@ -263,7 +263,9 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
              "$type | $amount");
          }
 
-         $this->assertSame($currentValue, $cache->get($key1), $type);
+         // This comes out as a string for Memcache so we must use
+         // assertEquals rather than assertSame.
+         $this->assertEquals($currentValue, $cache->get($key1), $type);
 
          $this->assertTrue($cache->delete($key1));
          $this->assertSame(7, $cache->increment($key1, 7), $type);
@@ -306,7 +308,9 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
              "$type | $amount");
          }
 
-         $this->assertSame($currentValue, $cache->get($key1), $type);
+         // This comes out as a string for Memcache so we must use
+         // assertEquals rather than assertSame.
+         $this->assertEquals($currentValue, $cache->get($key1), $type);
 
          $this->assertTrue($cache->delete($key1));
 
