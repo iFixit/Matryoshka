@@ -1,6 +1,169 @@
-Matryoshka
-==========
+# Matryoshka
 
 [![Build Status](https://travis-ci.org/iFixit/Matryoshka.png?branch=master)](https://travis-ci.org/iFixit/Matryoshka)
 
-A caching library for PHP built around nesting components.
+Matryoshka is a caching library for PHP built around nesting components like [Russian nesting dolls].
+
+[Russian nesting dolls]: http://en.wikipedia.org/wiki/Matryoshka_doll
+
+## Motivation
+
+The [Memcache] and [Memcached] PHP client libraries offer fairly low level access to [memcached servers].
+Matryoshka adds convenience functions to simplify common operations that aren't covered by the client libraries.
+Most of the functionality is provided by nesting `Backend`s.
+For example, prefixing cache keys is accomplished by nesting an existing `Backend` with a `Prefixed` backend.
+This philosophy results in very modular components that are easy to swap in and out and simplify testing.
+
+This concept is used to support key prefixing, disabling `get`s/`set`s/`delete`s, defining cache fallbacks in a hierarchy, storing values in clearable scope, and recording statistics.
+
+[Memcache]: http://php.net/memcache
+[Memcached]: http://php.net/memcached
+[memcached servers]: http://memcached.org
+
+## Backends
+
+### Enabled
+
+Disables `get`, `set`, or `delete` operations.
+
+```php
+$cache = new Matryoshka\Enabled(...);
+$cache->getsEnabled = false;
+$cache->get('key'); // Always results in a miss.
+```
+
+### Hierarchy
+
+Sets caches in a hierarchy to prefer faster caches that get filled in by slower caches.
+
+```php
+$cache = new Matryoshka\Hierarchy([
+   new Matryoshka\MemoryArray(),
+   new Matryoshka\Memcache(new Memcache('localhost')),
+   new Matryoshka\Memcache(new Memcache($cacheServers)),
+]);
+
+// This misses the first two caches (array and local memcached) but hits the
+// final cache. The retrieved value is then set in the local memcache as well
+// as the memory array so subsequent requests can be fulfilled faster.
+$value = $cache->getAndSet('key', function() {
+   return 'value';
+}, 3600);
+// This is retrieved from the memory array without going all the way to
+// Memcache.
+$value = $cache->getAndSet('key', function() {
+   return 'value';
+}, 3600);
+```
+
+### Memcache
+
+Wraps the [Memcache] client library.
+
+```php
+$memcache = new Memcache();
+$memcache->pconnect('localhost', 11211);
+$cache = new Matryoshka\Memcache($memcache);
+
+$value = $cache->get('key');
+```
+
+### MemoryArray
+
+Caches values in a local memory array that lasts the duration of the PHP process.
+
+```php
+$cache = new Matryoshka\MemoryArray();
+$cache->set('key', 'value');
+$value = $cache->get('key');
+```
+
+### Prefixed
+
+Prefixes all keys with a string.
+
+```php
+$cache = new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix-');
+// The key ends up being "prefix-key".
+$cache->set('key', 'value');
+$value = $cache->get('key');
+```
+
+### Scoped
+
+Caches values in a scope that can be deleted to invalidate all cache entries under the scope.
+
+```php
+$cache = new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope');
+$cache->set('key', 'value');
+$value = $cache->get('key');
+$cache->deleteScope();
+// This results in a miss because the scope has been deleted.
+$value = $cache->get('key');
+```
+
+### Stats
+
+Records counts and timings for operations to be used for metrics.
+
+```php
+$cache = new Matryoshka\Stats(new Matryoshka\MemoryArray());
+$cache->set('key', 'value');
+$value = $cache->get('key');
+var_dump($cache->getStats());
+// array(
+//    'get_count' => 1,
+//    'get_time' => 0.007,
+//    'set_count' => 1
+//    'set_time' => 0.008,
+//    ...
+// )
+```
+
+## Convenience Functions
+
+### getAndSet
+
+Wrapper for `get()` and `set()` that uses a read-through callback to generate missed values.
+
+```php
+$cache = new Matryoshka\MemoryArray();
+// Calls the provided callback if the key is not found and sets it in the cache
+// before returning the value to the caller.
+$value = $cache->getAndSet('key', function() {
+   return 'value';
+});
+```
+
+### getAndSetMultiple
+
+Wrapper around `getMultiple()` that uses a callback to generate values in batch to populate the cache.
+
+
+```php
+$cache = new Matryoshka\MemoryArray();
+$keys = [
+   'key1' => 'id1',
+   'key2' => 'id2'
+];
+// Calls the provided callback for any missed keys so the missing values can be
+// generated and set before returning them to the caller. The values are
+// returned in the same order as the provided keys.
+$values = $cache->getAndSetMultiple($keys, function($missing) {
+   // Use the id's to fill in the missing values.
+   foreach ($missing as $key => $id) {
+      if ($id == 'id1') {
+         $value = 'value1';
+      } else if ($id == 'id2') {
+         $value = 'value2';
+      }
+
+      $missing[$key] = $value;
+   }
+
+   // Return the new values to be cached and merged with the hits.
+   return $missing;
+});
+```
+
+## License
