@@ -95,4 +95,18 @@ class Local extends Backend {
 
       return $success;
    }
+
+   public function setMultiple(array $values, $expiration = 0) {
+      $success = true;
+
+      foreach ($values as $key => $value) {
+         if ($this->backend->set($key, $value, $expiration)) {
+            $this->cache[$key] = $value;
+         } else {
+            $success = false;
+         }
+      }
+
+      return $success;
+   }
 }
