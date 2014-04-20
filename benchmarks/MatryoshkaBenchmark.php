@@ -66,6 +66,15 @@ class MatryoshkaBenchmark {
       self::getAndSetMultipleBase($cache, $allKeys);
    }
 
+   private static function benchmarkGetAndSetMultipleHalf1000Setup(
+    Matryoshka\Backend $cache, $count) {
+      return self::getAndSetMultipleBaseSetup($cache, $count, 1000, 2);
+   }
+   private static function benchmarkGetAndSetMultipleHalf1000(
+    Matryoshka\Backend $cache, $count, $allKeys) {
+      self::getAndSetMultipleBase($cache, $allKeys);
+   }
+
    private static function benchmarkGetAndSetMultipleHalf100Setup(
     Matryoshka\Backend $cache, $count) {
       return self::getAndSetMultipleBaseSetup($cache, $count, 100, 2);
