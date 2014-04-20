@@ -72,10 +72,12 @@ class Local extends Backend {
       list($backendFound, $backendMissing) =
        $this->backend->getMultiple($localMissing);
 
-      $backendHits = array_filter($backendFound);
-
       // Merge the hits into the local cache.
-      $this->cache = array_merge($this->cache, $backendHits);
+      foreach ($backendFound as $key => $value) {
+         if ($value !== self::MISS) {
+            $this->cache[$key] = $value;
+         }
+      }
 
       // Merge in all of the values starting with the provided keys, then the
       // local values, then the backend values (including misses). This will
