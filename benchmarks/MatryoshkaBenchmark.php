@@ -47,7 +47,7 @@ class MatryoshkaBenchmark {
    private static function benchmarkHalfHitsSetup(Matryoshka\Backend $cache,
     $count) {
       for ($i = 0; $i < $count; $i += 2) {
-         $cache->set("halfHits{$i}");
+         $cache->set("halfHits{$i}", "value{$i}");
       }
    }
    private static function benchmarkHalfHits(Matryoshka\Backend $cache,
@@ -72,7 +72,7 @@ class MatryoshkaBenchmark {
 
          foreach ($backends as $type => $cache) {
             $setupMethodName = "{$method}Setup";
-            if (method_exists('self', $setupMethodName)) {
+            if (method_exists(get_called_class(), $setupMethodName)) {
                self::$setupMethodName($cache, $count);
             }
             $start = microtime(true);
@@ -170,7 +170,7 @@ class MatryoshkaBenchmark {
          ]),
          'MemArrayMemcacheHier' => new Matryoshka\Hierarchy([
             new Matryoshka\MemoryArray(),
-            self::getMemcache()
+            new Matryoshka\Memcache(self::getMemcache())
          ]),
          'Memcache' => new Matryoshka\Memcache(self::getMemcache()),
          'MemArray' => new Matryoshka\MemoryArray(),
