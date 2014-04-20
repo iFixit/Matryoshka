@@ -172,6 +172,9 @@ class MatryoshkaBenchmark {
             new Matryoshka\MemoryArray(),
             new Matryoshka\Memcache(self::getMemcache())
          ]),
+         'LocalMemcache' => new Matryoshka\Local(
+            new Matryoshka\Memcache(self::getMemcache())
+         ),
          'Memcache' => new Matryoshka\Memcache(self::getMemcache()),
          'MemArray' => new Matryoshka\MemoryArray(),
          'PrefixedMemArray' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
