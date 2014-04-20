@@ -6,12 +6,12 @@ use iFixit\Matryoshka;
 
 Matryoshka::autoload();
 
-MatrysohkaBenchmark::run();
+MatryoshkaBenchmark::run();
 
 /**
  * Runs various benchmarks on various Backends.
  */
-class MatrysohkaBenchmark {
+class MatryoshkaBenchmark {
    // See displayHelp() for more info.
    private static $options = [
       'benchmark' => null,
@@ -191,7 +191,7 @@ class MatrysohkaBenchmark {
    }
 
    private static function getBenchmarkMethods($regex) {
-      $class = new ReflectionClass('MatrysohkaBenchmark');
+      $class = new ReflectionClass('MatryoshkaBenchmark');
       $methods = $class->getMethods();
       $benchmarkMethods = [];
 
