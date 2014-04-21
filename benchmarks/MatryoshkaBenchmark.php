@@ -6,12 +6,12 @@ use iFixit\Matryoshka;
 
 Matryoshka::autoload();
 
-MatrysohkaBenchmark::run();
+MatryoshkaBenchmark::run();
 
 /**
  * Runs various benchmarks on various Backends.
  */
-class MatrysohkaBenchmark {
+class MatryoshkaBenchmark {
    // See displayHelp() for more info.
    private static $options = [
       'benchmark' => null,
@@ -47,13 +47,82 @@ class MatrysohkaBenchmark {
    private static function benchmarkHalfHitsSetup(Matryoshka\Backend $cache,
     $count) {
       for ($i = 0; $i < $count; $i += 2) {
-         $cache->set("halfHits{$i}");
+         $cache->set("halfHits{$i}", "value{$i}");
       }
    }
    private static function benchmarkHalfHits(Matryoshka\Backend $cache,
     $count) {
       for ($i = 0; $i < $count; $i++) {
          $cache->get("halfHits{$i}");
+      }
+   }
+
+   private static function benchmarkGetAndSetMultipleAll100Setup(
+    Matryoshka\Backend $cache, $count) {
+      return self::getAndSetMultipleBaseSetup($cache, $count, 100, 1);
+   }
+   private static function benchmarkGetAndSetMultipleAll100(
+    Matryoshka\Backend $cache, $count, $allKeys) {
+      self::getAndSetMultipleBase($cache, $allKeys);
+   }
+
+   private static function benchmarkGetAndSetMultipleHalf1000Setup(
+    Matryoshka\Backend $cache, $count) {
+      return self::getAndSetMultipleBaseSetup($cache, $count, 1000, 2);
+   }
+   private static function benchmarkGetAndSetMultipleHalf1000(
+    Matryoshka\Backend $cache, $count, $allKeys) {
+      self::getAndSetMultipleBase($cache, $allKeys);
+   }
+
+   private static function benchmarkGetAndSetMultipleHalf100Setup(
+    Matryoshka\Backend $cache, $count) {
+      return self::getAndSetMultipleBaseSetup($cache, $count, 100, 2);
+   }
+   private static function benchmarkGetAndSetMultipleHalf100(
+    Matryoshka\Backend $cache, $count, $allKeys) {
+      self::getAndSetMultipleBase($cache, $allKeys);
+   }
+
+   private static function benchmarkGetAndSetMultipleNone100Setup(
+    Matryoshka\Backend $cache, $count) {
+      return self::getAndSetMultipleBaseSetup($cache, $count, 100, $count + 1);
+   }
+   private static function benchmarkGetAndSetMultipleNone100(
+    Matryoshka\Backend $cache, $count, $allKeys) {
+      self::getAndSetMultipleBase($cache, $allKeys);
+   }
+
+   private static function getAndSetMultipleBaseSetup(Matryoshka\Backend $cache,
+    $count, $numPerCall, $keysPerHit) {
+      $keyBase = 'multi_' . microtime();
+      // We're getting the same number of values but in fewer getMultiple calls.
+      $count = $count / $numPerCall;
+
+      $allKeys = [];
+      for ($i = 0; $i < $count; $i++) {
+         $keys = [];
+         for ($j = 0; $j < $numPerCall; $j++) {
+            $key = "{$keyBase}_{$i}_{$j}";
+            $value = "value{$i}_{$j}";
+
+            if ($j % $keysPerHit === 0) {
+               $cache->set($key, $value);
+            }
+            $keys[$key] = $value;
+         }
+
+         $allKeys[] = $keys;
+      }
+
+      return $allKeys;
+   }
+   private static function getAndSetMultipleBase(Matryoshka\Backend $cache,
+    $allKeys) {
+      foreach ($allKeys as $keys) {
+         $cache->getAndSetMultiple($keys, function($missing) {
+            return $missing;
+         });
       }
    }
 
@@ -72,11 +141,12 @@ class MatrysohkaBenchmark {
 
          foreach ($backends as $type => $cache) {
             $setupMethodName = "{$method}Setup";
-            if (method_exists('self', $setupMethodName)) {
-               self::$setupMethodName($cache, $count);
+            $setupResult = null;
+            if (method_exists(get_called_class(), $setupMethodName)) {
+               $setupResult = self::$setupMethodName($cache, $count);
             }
             $start = microtime(true);
-            self::$method($cache, $count);
+            self::$method($cache, $count, $setupResult);
             $end = microtime(true);
             $time = $end - $start;
             $msPerCall = ($time / $count) * 1000;
@@ -123,7 +193,7 @@ class MatrysohkaBenchmark {
           reset($benchmark2)['msPerCall']) * 10000;
       });
 
-      $benchmarkWidth = 20;
+      $benchmarkWidth = 25;
       $backendWidth = 20;
       $first = true;
       foreach ($results as $benchmark => $benchmarkResults) {
@@ -170,8 +240,11 @@ class MatrysohkaBenchmark {
          ]),
          'MemArrayMemcacheHier' => new Matryoshka\Hierarchy([
             new Matryoshka\MemoryArray(),
-            self::getMemcache()
+            new Matryoshka\Memcache(self::getMemcache())
          ]),
+         'LocalMemcache' => new Matryoshka\Local(
+            new Matryoshka\Memcache(self::getMemcache())
+         ),
          'Memcache' => new Matryoshka\Memcache(self::getMemcache()),
          'MemArray' => new Matryoshka\MemoryArray(),
          'PrefixedMemArray' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
@@ -191,7 +264,7 @@ class MatrysohkaBenchmark {
    }
 
    private static function getBenchmarkMethods($regex) {
-      $class = new ReflectionClass('MatrysohkaBenchmark');
+      $class = new ReflectionClass('MatryoshkaBenchmark');
       $methods = $class->getMethods();
       $benchmarkMethods = [];
 
