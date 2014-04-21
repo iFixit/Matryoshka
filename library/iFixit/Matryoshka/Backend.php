@@ -112,12 +112,14 @@ abstract class Backend {
 
       foreach ($values as $key => $value) {
          // Ignore keys that weren't originally requested or are misses.
-         // TODO: setMultiple?
          if (array_key_exists($key, $keys) && $value !== self::MISS) {
             $found[$key] = $value;
-            $this->set($key, $value, $expiration);
+         } else {
+            unset($values[$key]);
          }
       }
+
+      $this->setMultiple($values, $expiration);
 
       // Remove misses.
       foreach ($found as $key => $value) {
@@ -127,6 +129,23 @@ abstract class Backend {
       }
 
       return $found;
+   }
+
+   /**
+    * Sets multiple key/value pairs with the given expiration.
+    *
+    * @param $values Array of [key => value] to set.
+    *
+    * @return True if all values set successfully, false otherwise.
+    */
+   public function setMultiple(array $values, $expiration = 0) {
+      $success = true;
+
+      foreach ($values as $key => $value) {
+         $success = $this->set($key, $value, $expiration) && $success;
+      }
+
+      return $success;
    }
 
    /**
