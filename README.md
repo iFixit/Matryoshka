@@ -70,6 +70,18 @@ $cache = new Matryoshka\KeyShortener(
 $cache->get("long_key_that_needs_to_be_shortened_by_just_a_little_bit");
 ```
 
+### Local
+
+Caches all values in a local array so subsequent requests for the same key can be fulfilled faster.
+It's faster version of:
+
+```php
+$cache = new Matryoshka\Hierarchy([
+   new Matryoshka\MemoryArray(),
+   Matryoshka\Memcache::create(new Memcache('localhost'))
+]);
+```
+
 ### Memcache
 
 Wraps the [Memcache] client library.
