@@ -235,6 +235,10 @@ class MatryoshkaBenchmark {
       $allBackends = [
          'EnabledMemArray' => new Matryoshka\Enabled(new Matryoshka\MemoryArray()),
          'DisabledMemArray' => self::getDisabled(new Matryoshka\MemoryArray()),
+         'KeyShortMemArray' => new Matryoshka\KeyShortener(
+            new Matryoshka\MemoryArray(),
+            40
+         ),
          'MemArrayHierarchy' => new Matryoshka\Hierarchy([
             new Matryoshka\MemoryArray()
          ]),
