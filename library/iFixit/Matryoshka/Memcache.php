@@ -6,10 +6,20 @@ use iFixit\Matryoshka;
 
 class Memcache extends Backend {
    const FLAGS = MEMCACHE_COMPRESSED;
+   const MAX_KEY_LENGTH = 255;
 
    private $memcache;
 
-   public function __construct(\Memcache $memcache) {
+   /**
+    * Factory method. This forces Memcache to always be wrapped in a
+    * KeyShortener to fix keys that are too long and would otherwise get
+    * truncated.
+    */
+   public static function create(\Memcache $memcache) {
+      return new KeyShortener(new Memcache($memcache), self::MAX_KEY_LENGTH);
+   }
+
+   private function __construct(\Memcache $memcache) {
       $this->memcache = $memcache;
    }
 

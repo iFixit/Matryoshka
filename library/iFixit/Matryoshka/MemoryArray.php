@@ -8,7 +8,7 @@ use iFixit\Matryoshka;
  * Simple in-memory PHP array to cache objects for this process.
  */
 class MemoryArray extends Backend {
-   private $cache;
+   protected $cache;
 
    public function __construct() {
       $this->cache = [];
