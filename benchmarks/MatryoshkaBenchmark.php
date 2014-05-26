@@ -240,12 +240,12 @@ class MatryoshkaBenchmark {
          ]),
          'MemArrayMemcacheHier' => new Matryoshka\Hierarchy([
             new Matryoshka\MemoryArray(),
-            new Matryoshka\Memcache(self::getMemcache())
+            Matryoshka\Memcache::create(self::getMemcache())
          ]),
          'LocalMemcache' => new Matryoshka\Local(
-            new Matryoshka\Memcache(self::getMemcache())
+            Matryoshka\Memcache::create(self::getMemcache())
          ),
-         'Memcache' => new Matryoshka\Memcache(self::getMemcache()),
+         'Memcache' => Matryoshka\Memcache::create(self::getMemcache()),
          'MemArray' => new Matryoshka\MemoryArray(),
          'PrefixedMemArray' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
          'ScopedMemArray' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
