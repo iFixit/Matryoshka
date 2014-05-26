@@ -32,6 +32,10 @@ class Memcache extends Backend {
    }
 
    public function increment($key, $amount = 1, $expiration = 0) {
+      if ($amount < 0) {
+         return $this->decrement($key, -$amount, $expiration);
+      }
+
       $result = $this->memcache->increment($key, $amount);
 
       if ($result !== false) {
@@ -47,6 +51,10 @@ class Memcache extends Backend {
    }
 
    public function decrement($key, $amount = 1, $expiration = 0) {
+      if ($amount < 0) {
+         return $this->increment($key, -$amount, $expiration);
+      }
+
       // TODO: Memcache doesn't support decrementing under 0 so there isn't
       // much we can do for the missing case.
       return $this->memcache->decrement($key, $amount);
