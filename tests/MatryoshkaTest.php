@@ -10,7 +10,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
    public function testHierarchy() {
       $backends = [
          new Matryoshka\MemoryArray(),
-         new Matryoshka\Memcache($this->getMemcache())
+         Matryoshka\Memcache::create($this->getMemcache())
       ];
       $hierarchy = new Matryoshka\Hierarchy($backends);
       $allBackends = array_merge($backends, [$hierarchy]);
@@ -99,7 +99,7 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testMemcache() {
-      $cache = new Matryoshka\Memcache($this->getMemcache());
+      $cache = Matryoshka\Memcache::create($this->getMemcache());
       list($key, $value) = $this->getRandomKeyValue();
       $this->assertTrue($cache->set($key, $value, 1));
       // Wait for it to expire.
@@ -168,6 +168,35 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
 
       $this->assertSame(2, $stats['get_count']);
       $this->assertSame(1, $stats['get_hit_count']);
+   }
+
+   public function testKeyShortener() {
+      $maxLength = 50;
+      $intactKeyLength = $maxLength - Matryoshka\KeyShortener::MD5_STRLEN;
+      $memoryCache = new TestMemoryArray();
+      $cache = new Matryoshka\KeyShortener($memoryCache, $maxLength);
+
+      $keys = [
+         'short',
+         str_repeat('a', $maxLength),
+         str_repeat('a', $maxLength + 1),
+         str_repeat('a', $maxLength * 10)
+      ];
+
+      foreach ($keys as $key) {
+         $cache->set($key, $key);
+      }
+
+      $cachedValues = $memoryCache->getCache();
+
+      $this->assertCount(count($keys), $cachedValues);
+
+      foreach ($cachedValues as $shortenedKey => $originalKey) {
+         $this->assertLessThanOrEqual($maxLength, strlen($shortenedKey));
+
+         $this->assertSame(substr($originalKey, 0, $intactKeyLength),
+          substr($shortenedKey, 0, $intactKeyLength));
+      }
    }
 
    /**
@@ -452,6 +481,23 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
       }
    }
 
+   public function testlongKeys() {
+      list($key, $value) = $this->getRandomKeyValue();
+      // Make a super long key.
+      $key = str_repeat($key, 100);
+
+      foreach ($this->getAllBackends() as $type => $cache) {
+         $this->assertNull($cache->get($key), $type);
+         $this->assertTrue($cache->set($key, $value), $type);
+         $this->assertSame($value, $cache->get($key), $type);
+
+         $newKey = "{$key}-new";
+         $newValue = "{$value}-new";
+         $this->assertNull($cache->get($newKey), $type);
+         $this->assertTrue($cache->set($newKey, $newValue), $type);
+      }
+   }
+
    private function getRandomKeyValue() {
       return [
          'key-' . rand(),
@@ -481,12 +527,20 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
             new Matryoshka\MemoryArray(),
             new Matryoshka\MemoryArray()
          ]),
+         'KeyShortener' => new Matryoshka\KeyShortener(new Matryoshka\MemoryArray(), 40),
          'Local' => new Matryoshka\Local(new Matryoshka\MemoryArray()),
-         'Memcache' => new Matryoshka\Memcache($this->getMemcache()),
+         'Memcache' => Matryoshka\Memcache::create($this->getMemcache()),
          'MemoryArray' => new Matryoshka\MemoryArray(),
          'Prefixed' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
          'Scoped' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
          'Stats' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
       ];
+   }
+}
+
+// Exposes the array of cached values.
+class TestMemoryArray extends Matryoshka\MemoryArray {
+   public function getCache() {
+      return $this->cache;
    }
 }

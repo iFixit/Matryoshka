@@ -39,8 +39,8 @@ Sets caches in a hierarchy to prefer faster caches that get filled in by slower 
 ```php
 $cache = new Matryoshka\Hierarchy([
    new Matryoshka\MemoryArray(),
-   new Matryoshka\Memcache(new Memcache('localhost')),
-   new Matryoshka\Memcache(new Memcache($cacheServers)),
+   Matryoshka\Memcache::create(new Memcache('localhost')),
+   Matryoshka\Memcache::create(new Memcache($cacheServers)),
 ]);
 
 // This misses the first two caches (array and local memcached) but hits the
@@ -56,6 +56,20 @@ $value = $cache->getAndSet('key', function() {
 }, 3600);
 ```
 
+### KeyShortener
+
+Ensures that all keys are at most the specified length by shortening longer ones.
+
+```php
+$cache = new Matryoshka\KeyShortener(
+   new Matryoshka\MemoryArray(),
+   $maxLength = 50
+);
+
+// Gets converted to: `long_key_that_need2552e62135d11e8d4233e2a51868132e`
+$cache->get("long_key_that_needs_to_be_shortened_by_just_a_little_bit");
+```
+
 ### Memcache
 
 Wraps the [Memcache] client library.
@@ -63,7 +77,7 @@ Wraps the [Memcache] client library.
 ```php
 $memcache = new Memcache();
 $memcache->pconnect('localhost', 11211);
-$cache = new Matryoshka\Memcache($memcache);
+$cache = Matryoshka\Memcache::create($memcache);
 
 $value = $cache->get('key');
 ```
