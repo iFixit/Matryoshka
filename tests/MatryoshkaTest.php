@@ -368,24 +368,38 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
 
          $this->assertNull($cache->get($key), $type);
 
-         $hit = false;
-         $callback = function() use ($value, &$hit) {
-            $hit = true;
+         $miss = false;
+         $callback = function() use ($value, &$miss) {
+            $miss = true;
             return $value;
          };
 
          $getAndSetValue = $cache->getAndSet($key, $callback);
 
-         $this->assertTrue($hit, $type);
+         $this->assertTrue($miss, $type);
          $this->assertSame($value, $getAndSetValue, $type);
          $this->assertSame($value, $cache->get($key), $type);
 
-         $hit = false;
+         $miss = false;
          $getAndSetValue = $cache->getAndSet($key, $callback);
 
-         $this->assertFalse($hit, $type);
+         $this->assertFalse($miss, $type);
          $this->assertSame($value, $getAndSetValue, $type);
          $this->assertSame($value, $cache->get($key), $type);
+
+         $miss = false;
+         list(, $newValue) = $this->getRandomKeyValue();
+         $callback = function() use ($newValue, &$miss) {
+            $miss = true;
+            return $newValue;
+         };
+
+         // Try resetting the cache with getAndSet.
+         $getAndSetValue = $cache->getAndSet($key, $callback, 0, $reset = true);
+
+         $this->assertTrue($miss, $type);
+         $this->assertSame($newValue, $getAndSetValue, $type);
+         $this->assertSame($newValue, $cache->get($key), $type);
       }
    }
 

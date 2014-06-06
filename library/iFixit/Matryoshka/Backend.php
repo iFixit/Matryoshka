@@ -74,10 +74,13 @@ abstract class Backend {
     * Wrapper around get and set that uses the provided callback to retrieve
     * and populate the cache if the key is not found in the cache.
     *
+    * @param $reset If true, always call the callback to reset the cache.
+    *
     * @return the value
     */
-   public function getAndSet($key, callable $callback, $expiration = 0) {
-      $value = $this->get($key);
+   public function getAndSet($key, callable $callback, $expiration = 0,
+    $reset = false) {
+      $value = $reset ? self::MISS : $this->get($key);
 
       if ($value === self::MISS) {
          $value = $callback();
