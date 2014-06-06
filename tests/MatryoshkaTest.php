@@ -400,6 +400,18 @@ class MatryoshkaTest extends PHPUnit_Framework_TestCase {
          $this->assertTrue($miss, $type);
          $this->assertSame($newValue, $getAndSetValue, $type);
          $this->assertSame($newValue, $cache->get($key), $type);
+
+
+         list($key, $value) = $this->getRandomKeyValue();
+         $this->assertNull($cache->get($key), $type);
+         $cache->set($key, $value);
+
+         // Return null from the callback and make sure the value isn't updated.
+         $getAndSetValue = $cache->getAndSet($key,
+          function() { return null; }, 0, $reset = true);
+
+         $this->assertNull($getAndSetValue, $type);
+         $this->assertSame($value, $cache->get($key), $type);
       }
    }
 

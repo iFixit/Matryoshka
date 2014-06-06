@@ -84,7 +84,10 @@ abstract class Backend {
 
       if ($value === self::MISS) {
          $value = $callback();
-         $this->set($key, $value, $expiration);
+
+         if ($value !== self::MISS) {
+            $this->set($key, $value, $expiration);
+         }
       }
 
       return $value;
