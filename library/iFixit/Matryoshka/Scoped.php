@@ -22,7 +22,7 @@ class Scoped extends KeyChanger {
       return "{$prefix}$key";
    }
 
-   private function getScopePrefix() {
+   public function getScopePrefix() {
       if ($this->scopePrefix === null) {
          // TODO: This doesn't set an expiration time. Make it user configurable?
          // TODO: This introduces a race condition between the miss and the
@@ -34,6 +34,10 @@ class Scoped extends KeyChanger {
       }
 
       return $this->scopePrefix;
+   }
+
+   public function getScopeName() {
+      return $this->scopeName;
    }
 
    public function deleteScope() {
