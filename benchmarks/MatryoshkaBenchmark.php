@@ -231,6 +231,16 @@ class MatryoshkaBenchmark {
       return $disabled;
    }
 
+   private static function getMultiScoped(Matryoshka\Backend $backend, $count) {
+      $scoped = new Matryoshka\MultiScoped($backend);
+
+      for ($i = 0; $i < $count; $i++) {
+         $scoped->addScope(new Matryoshka\Scoped($backend, "scope-{$i}"));
+      }
+
+      return $scoped;
+   }
+
    private static function getTestBackends($regex) {
       $allBackends = [
          'EnabledMemArray' => new Matryoshka\Enabled(new Matryoshka\MemoryArray()),
@@ -253,6 +263,8 @@ class MatryoshkaBenchmark {
          'MemArray' => new Matryoshka\MemoryArray(),
          'PrefixedMemArray' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
          'ScopedMemArray' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
+         'MultiScope2MemArray' => self::getMultiScoped(new Matryoshka\MemoryArray(), 2),
+         'MultiScope10MemArray' => self::getMultiScoped(new Matryoshka\MemoryArray(), 10),
          'StatsMemArray' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
       ];
 
