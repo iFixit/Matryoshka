@@ -10,6 +10,10 @@ class Memcache extends Backend {
 
    private $memcache;
 
+   public static function isAvailable() {
+      return class_exists('Memcache', false);
+   }
+
    /**
     * Factory method. This forces Memcache to always be wrapped in a
     * KeyShortener to fix keys that are too long and would otherwise get

@@ -11,6 +11,13 @@ abstract class Backend {
    const MISS = null;
 
    /**
+    * Returns true if this backend is available for use on the current system.
+    */
+   public static function isAvailable() {
+      return true;
+   }
+
+   /**
     * Associates the value with the key in the cache. The value will expire
     * after the specified expiration time in seconds.
     *
