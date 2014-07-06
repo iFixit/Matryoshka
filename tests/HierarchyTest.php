@@ -7,19 +7,19 @@ use iFixit\Matryoshka;
 class HierarchyTest extends AbstractBackendTest {
    protected function getBackend() {
       return new Matryoshka\Hierarchy([
-         new Matryoshka\MemoryArray(),
-         new Matryoshka\MemoryArray()
+         new Matryoshka\Ephemeral(),
+         new Matryoshka\Ephemeral()
       ]);
    }
 
    public function testHierarchy() {
       $backends = [
-         new Matryoshka\MemoryArray(),
+         new Matryoshka\Ephemeral(),
          // Use Memcache as the backend if it exists, otherwise just use an
          // in memory array.
          Matryoshka\Memcache::isAvailable() ?
           Matryoshka\Memcache::create($this->getMemcache()) :
-          new Matryoshka\MemoryArray()
+          new Matryoshka\Ephemeral()
       ];
       $hierarchy = new Matryoshka\Hierarchy($backends);
       $allBackends = array_merge($backends, [$hierarchy]);

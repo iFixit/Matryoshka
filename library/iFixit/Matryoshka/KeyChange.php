@@ -4,7 +4,7 @@ namespace iFixit\Matryoshka;
 
 use iFixit\Matryoshka;
 
-abstract class KeyChanger extends Backend {
+abstract class KeyChange extends Backend {
    private $backend;
 
    public abstract function changeKey($key);

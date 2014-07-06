@@ -8,7 +8,7 @@ use iFixit\Matryoshka;
  * Shortens long keys by hashing the entire key and appending it to a substring
  * of the original key.
  */
-class KeyShortener extends KeyChanger {
+class KeyShorten extends KeyChange {
    const MD5_STRLEN = 32;
 
    private $maxLength;

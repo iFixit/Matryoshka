@@ -4,16 +4,16 @@ require_once 'AbstractBackendTest.php';
 
 use iFixit\Matryoshka;
 
-class KeyShortenerTest extends AbstractBackendTest {
+class KeyShortenTest extends AbstractBackendTest {
    protected function getBackend() {
-      return new Matryoshka\KeyShortener(new Matryoshka\MemoryArray(), 40);
+      return new Matryoshka\KeyShorten(new Matryoshka\Ephemeral(), 40);
    }
 
-   public function testKeyShortener() {
+   public function testKeyShorten() {
       $maxLength = 50;
-      $intactKeyLength = $maxLength - Matryoshka\KeyShortener::MD5_STRLEN;
-      $memoryCache = new TestMemoryArray();
-      $cache = new Matryoshka\KeyShortener($memoryCache, $maxLength);
+      $intactKeyLength = $maxLength - Matryoshka\KeyShorten::MD5_STRLEN;
+      $memoryCache = new TestEphemeral();
+      $cache = new Matryoshka\KeyShorten($memoryCache, $maxLength);
 
       $keys = [
          'short',

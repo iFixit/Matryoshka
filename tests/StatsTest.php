@@ -6,7 +6,7 @@ use iFixit\Matryoshka;
 
 class StatsTest extends AbstractBackendTest {
    protected function getBackend() {
-      return new Matryoshka\Stats(new Matryoshka\MemoryArray());
+      return new Matryoshka\Stats(new Matryoshka\Ephemeral());
    }
 
    public function testStats() {

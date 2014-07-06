@@ -4,15 +4,15 @@ require_once 'AbstractBackendTest.php';
 
 use iFixit\Matryoshka;
 
-class PrefixedTest extends AbstractBackendTest {
+class PrefixTest extends AbstractBackendTest {
    protected function getBackend() {
-      return new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix');
+      return new Matryoshka\Prefix(new Matryoshka\Ephemeral(), 'prefix');
    }
 
-   public function testPrefixed() {
-      $memoryCache = new Matryoshka\MemoryArray();
+   public function testPrefix() {
+      $memoryCache = new Matryoshka\Ephemeral();
       $prefix = 'prefix';
-      $prefixedCache = new Matryoshka\Prefixed($memoryCache,
+      $prefixedCache = new Matryoshka\Prefix($memoryCache,
        $prefix);
       list($key, $value) = $this->getRandomKeyValue();
 

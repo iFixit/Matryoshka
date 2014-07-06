@@ -4,17 +4,17 @@ namespace iFixit\Matryoshka;
 
 use iFixit\Matryoshka;
 
-class MultiScoped extends KeyChanger {
+class MultiScope extends KeyChange {
    private $scopes;
 
    public function __construct(Backend $backend, array $scopes = []) {
       parent::__construct($backend);
 
       foreach ($scopes as $scope) {
-         if (!($scope instanceof Scoped)) {
+         if (!($scope instanceof Scope)) {
             $type = is_object($scope) ? get_class($scope) : gettype($scope);
             throw new \InvalidArgumentException(
-             "Not an instance of Scoped: $type");
+             "Not an instance of Scope: $type");
          }
       }
 
@@ -22,7 +22,7 @@ class MultiScoped extends KeyChanger {
       $this->sortScopes();
    }
 
-   public function addScope(Scoped $scoped) {
+   public function addScope(Scope $scoped) {
       $this->scopes[] = $scoped;
       $this->sortScopes();
 

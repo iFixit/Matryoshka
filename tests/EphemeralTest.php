@@ -4,8 +4,8 @@ require_once 'AbstractBackendTest.php';
 
 use iFixit\Matryoshka;
 
-class LocalTest extends AbstractBackendTest {
+class EphemeralTest extends AbstractBackendTest {
    protected function getBackend() {
-      return new Matryoshka\Local(new Matryoshka\Ephemeral());
+      return new Matryoshka\Ephemeral();
    }
 }

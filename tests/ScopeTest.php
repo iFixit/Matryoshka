@@ -4,15 +4,15 @@ require_once 'AbstractBackendTest.php';
 
 use iFixit\Matryoshka;
 
-class ScopedTest extends AbstractBackendTest {
+class ScopeTest extends AbstractBackendTest {
    protected function getBackend() {
-      return new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope');
+      return new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
    }
 
-   public function testScoped() {
-      $memoryCache = new Matryoshka\MemoryArray();
+   public function testScope() {
+      $memoryCache = new Matryoshka\Ephemeral();
       $scope = 'scope';
-      $scopedCache = new Matryoshka\Scoped($memoryCache,
+      $scopedCache = new Matryoshka\Scope($memoryCache,
        $scope);
       list($key1, $value1) = $this->getRandomKeyValue();
       list($key2, $value2) = $this->getRandomKeyValue();

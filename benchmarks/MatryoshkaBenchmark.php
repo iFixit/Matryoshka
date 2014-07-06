@@ -223,7 +223,7 @@ class MatryoshkaBenchmark {
    }
 
    private static function getDisabled(Matryoshka\Backend $backend) {
-      $disabled = new Matryoshka\Enabled($backend);
+      $disabled = new Matryoshka\Enable($backend);
       $disabled->getsEnabled = false;
       $disabled->setsEnabled = false;
       $disabled->deletesEnabled = false;
@@ -231,11 +231,11 @@ class MatryoshkaBenchmark {
       return $disabled;
    }
 
-   private static function getMultiScoped(Matryoshka\Backend $backend, $count) {
-      $scoped = new Matryoshka\MultiScoped($backend);
+   private static function getMultiScope(Matryoshka\Backend $backend, $count) {
+      $scoped = new Matryoshka\MultiScope($backend);
 
       for ($i = 0; $i < $count; $i++) {
-         $scoped->addScope(new Matryoshka\Scoped($backend, "scope-{$i}"));
+         $scoped->addScope(new Matryoshka\Scope($backend, "scope-{$i}"));
       }
 
       return $scoped;
@@ -243,29 +243,29 @@ class MatryoshkaBenchmark {
 
    private static function getTestBackends($regex) {
       $allBackends = [
-         'EnabledMemArray' => new Matryoshka\Enabled(new Matryoshka\MemoryArray()),
-         'DisabledMemArray' => self::getDisabled(new Matryoshka\MemoryArray()),
-         'KeyShortMemArray' => new Matryoshka\KeyShortener(
-            new Matryoshka\MemoryArray(),
+         'EnabledMemArray' => new Matryoshka\Enable(new Matryoshka\Ephemeral()),
+         'DisabledMemArray' => self::getDisabled(new Matryoshka\Ephemeral()),
+         'KeyShortMemArray' => new Matryoshka\KeyShorten(
+            new Matryoshka\Ephemeral(),
             40
          ),
          'MemArrayHierarchy' => new Matryoshka\Hierarchy([
-            new Matryoshka\MemoryArray()
+            new Matryoshka\Ephemeral()
          ]),
          'MemArrayMemcacheHier' => new Matryoshka\Hierarchy([
-            new Matryoshka\MemoryArray(),
+            new Matryoshka\Ephemeral(),
             Matryoshka\Memcache::create(self::getMemcache())
          ]),
          'LocalMemcache' => new Matryoshka\Local(
             Matryoshka\Memcache::create(self::getMemcache())
          ),
          'Memcache' => Matryoshka\Memcache::create(self::getMemcache()),
-         'MemArray' => new Matryoshka\MemoryArray(),
-         'PrefixedMemArray' => new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix'),
-         'ScopedMemArray' => new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope'),
-         'MultiScope2MemArray' => self::getMultiScoped(new Matryoshka\MemoryArray(), 2),
-         'MultiScope10MemArray' => self::getMultiScoped(new Matryoshka\MemoryArray(), 10),
-         'StatsMemArray' => new Matryoshka\Stats(new Matryoshka\MemoryArray())
+         'MemArray' => new Matryoshka\Ephemeral(),
+         'PrefixMemArray' => new Matryoshka\Prefix(new Matryoshka\Ephemeral(), 'prefix'),
+         'ScopeMemArray' => new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope'),
+         'MultiScope2MemArray' => self::getMultiScope(new Matryoshka\Ephemeral(), 2),
+         'MultiScope10MemArray' => self::getMultiScope(new Matryoshka\Ephemeral(), 10),
+         'StatsMemArray' => new Matryoshka\Stats(new Matryoshka\Ephemeral())
       ];
 
       if ($regex !== null) {

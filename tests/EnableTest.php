@@ -4,9 +4,9 @@ require_once 'AbstractBackendTest.php';
 
 use iFixit\Matryoshka;
 
-class EnabledTest extends AbstractBackendTest {
+class EnableTest extends AbstractBackendTest {
    protected function getBackend() {
-      return new Matryoshka\Enabled(new Matryoshka\MemoryArray());
+      return new Matryoshka\Enable(new Matryoshka\Ephemeral());
    }
 
    public function testEnabled() {

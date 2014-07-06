@@ -11,7 +11,7 @@ Matryoshka is a caching library for PHP built around nesting components like [Ru
 The [Memcache] and [Memcached] PHP client libraries offer fairly low level access to [memcached servers].
 Matryoshka adds convenience functions to simplify common operations that aren't covered by the client libraries.
 Most of the functionality is provided by nesting `Backend`s.
-For example, prefixing cache keys is accomplished by nesting an existing `Backend` with a `Prefixed` backend.
+For example, prefixing cache keys is accomplished by nesting an existing `Backend` with a `Prefix` backend.
 This philosophy results in very modular components that are easy to swap in and out and simplify testing.
 
 This concept is used to support key prefixing, disabling `get`s/`set`s/`delete`s, defining cache fallbacks in a hierarchy, storing values in clearable scope, and recording statistics.
@@ -22,13 +22,13 @@ This concept is used to support key prefixing, disabling `get`s/`set`s/`delete`s
 
 ## Backends
 
-### Enabled
+### Enable
 
 Disables `get`, `set`, or `delete` operations.
 
 ```php
-$cache = new Matryoshka\Enabled(...);
-$cache->getsEnabled = false;
+$cache = new Matryoshka\Enable(...);
+$cache->getsEnable = false;
 $cache->get('key'); // Always results in a miss.
 ```
 
@@ -38,7 +38,7 @@ Sets caches in a hierarchy to prefer faster caches that get filled in by slower 
 
 ```php
 $cache = new Matryoshka\Hierarchy([
-   new Matryoshka\MemoryArray(),
+   new Matryoshka\Ephemeral(),
    Matryoshka\Memcache::create(new Memcache('localhost')),
    Matryoshka\Memcache::create(new Memcache($cacheServers)),
 ]);
@@ -56,13 +56,13 @@ $value = $cache->getAndSet('key', function() {
 }, 3600);
 ```
 
-### KeyShortener
+### KeyShorten
 
 Ensures that all keys are at most the specified length by shortening longer ones.
 
 ```php
-$cache = new Matryoshka\KeyShortener(
-   new Matryoshka\MemoryArray(),
+$cache = new Matryoshka\KeyShorten(
+   new Matryoshka\Ephemeral(),
    $maxLength = 50
 );
 
@@ -77,7 +77,7 @@ It's faster version of:
 
 ```php
 $cache = new Matryoshka\Hierarchy([
-   new Matryoshka\MemoryArray(),
+   new Matryoshka\Ephemeral(),
    Matryoshka\Memcache::create(new Memcache('localhost'))
 ]);
 ```
@@ -94,33 +94,33 @@ $cache = Matryoshka\Memcache::create($memcache);
 $value = $cache->get('key');
 ```
 
-### MemoryArray
+### Ephemeral
 
 Caches values in a local memory array that lasts the duration of the PHP process.
 
 ```php
-$cache = new Matryoshka\MemoryArray();
+$cache = new Matryoshka\Ephemeral();
 $cache->set('key', 'value');
 $value = $cache->get('key');
 ```
 
-### Prefixed
+### Prefix
 
 Prefixes all keys with a string.
 
 ```php
-$cache = new Matryoshka\Prefixed(new Matryoshka\MemoryArray(), 'prefix-');
+$cache = new Matryoshka\Prefix(new Matryoshka\Ephemeral(), 'prefix-');
 // The key ends up being "prefix-key".
 $cache->set('key', 'value');
 $value = $cache->get('key');
 ```
 
-### Scoped
+### Scope
 
 Caches values in a scope that can be deleted to invalidate all cache entries under the scope.
 
 ```php
-$cache = new Matryoshka\Scoped(new Matryoshka\MemoryArray(), 'scope');
+$cache = new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
 $cache->set('key', 'value');
 $value = $cache->get('key');
 $cache->deleteScope();
@@ -133,7 +133,7 @@ $value = $cache->get('key');
 Records counts and timings for operations to be used for metrics.
 
 ```php
-$cache = new Matryoshka\Stats(new Matryoshka\MemoryArray());
+$cache = new Matryoshka\Stats(new Matryoshka\Ephemeral());
 $cache->set('key', 'value');
 $value = $cache->get('key');
 var_dump($cache->getStats());
@@ -153,7 +153,7 @@ var_dump($cache->getStats());
 Wrapper for `get()` and `set()` that uses a read-through callback to generate missed values.
 
 ```php
-$cache = new Matryoshka\MemoryArray();
+$cache = new Matryoshka\Ephemeral();
 // Calls the provided callback if the key is not found and sets it in the cache
 // before returning the value to the caller.
 $value = $cache->getAndSet('key', function() {
@@ -167,7 +167,7 @@ Wrapper around `getMultiple()` that uses a callback to generate values in batch 
 
 
 ```php
-$cache = new Matryoshka\MemoryArray();
+$cache = new Matryoshka\Ephemeral();
 $keys = [
    'key1' => 'id1',
    'key2' => 'id2'

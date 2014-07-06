@@ -7,7 +7,7 @@ use iFixit\Matryoshka;
 /**
  * Allows disabling gets/sets/deletes/etc.
  */
-class Enabled extends Backend {
+class Enable extends Backend {
    private $backend;
    public $getsEnabled;
    // TODO: Rename to writesEnabled because it covers more than just `set`?

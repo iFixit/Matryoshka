@@ -4,7 +4,7 @@ namespace iFixit\Matryoshka;
 
 use iFixit\Matryoshka;
 
-class Scoped extends KeyChanger {
+class Scope extends KeyChange {
    private $backend;
    private $scopeName;
    private $scopePrefix;

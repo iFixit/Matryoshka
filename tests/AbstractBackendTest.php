@@ -355,7 +355,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
 }
 
 // Exposes the array of cached values.
-class TestMemoryArray extends Matryoshka\MemoryArray {
+class TestEphemeral extends Matryoshka\Ephemeral {
    public function getCache() {
       return $this->cache;
    }

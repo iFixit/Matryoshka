@@ -4,7 +4,7 @@ namespace iFixit\Matryoshka;
 
 use iFixit\Matryoshka;
 
-class Prefixed extends KeyChanger {
+class Prefix extends KeyChange {
    private $prefix;
 
    public function __construct(Backend $backend, $prefix) {

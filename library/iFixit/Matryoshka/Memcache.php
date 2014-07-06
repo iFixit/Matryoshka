@@ -16,11 +16,11 @@ class Memcache extends Backend {
 
    /**
     * Factory method. This forces Memcache to always be wrapped in a
-    * KeyShortener to fix keys that are too long and would otherwise get
+    * KeyShorten to fix keys that are too long and would otherwise get
     * truncated.
     */
    public static function create(\Memcache $memcache) {
-      return new KeyShortener(new Memcache($memcache), self::MAX_KEY_LENGTH);
+      return new KeyShorten(new Memcache($memcache), self::MAX_KEY_LENGTH);
    }
 
    private function __construct(\Memcache $memcache) {

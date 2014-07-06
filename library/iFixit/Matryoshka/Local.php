@@ -8,7 +8,7 @@ use iFixit\Matryoshka;
  * Faster version of:
  *
  * $cache = new Matryoshka\Hierarchy([
- *    new Matryoshka\MemoryArray(),
+ *    new Matryoshka\Ephemeral(),
  *    new Matryoshka\Memcache()
  * ]);
  */
