@@ -57,7 +57,12 @@ class Enable extends Backend {
       if ($this->getsEnabled) {
          return $this->backend->getMultiple($keys);
       } else {
-         return [[], $keys];
+         $found = [];
+         foreach ($keys as $key => $_) {
+            $found[$key] = self::MISS;
+         }
+
+         return [$found, $keys];
       }
    }
 
