@@ -18,6 +18,8 @@ class LocalTest extends AbstractBackendTest {
       $cache->set($key1, $value1);
       $ephemeral->delete($key1);
       $this->assertSame($value1, $cache->get($key1));
+      $cache->clear();
+      $this->assertNull($cache->get($key1));
 
       list($key2, $value2) = $this->getRandomKeyValue();
 

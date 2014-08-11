@@ -21,6 +21,14 @@ class Local extends Backend {
       $this->cache = [];
    }
 
+   /**
+    * Clears the locally cached values so all new requests pull data from the
+    * backend.
+    */
+   public function clear() {
+      $this->cache = [];
+   }
+
    public function set($key, $value, $expiration = 0) {
       $success = $this->backend->set($key, $value, $expiration);
 
