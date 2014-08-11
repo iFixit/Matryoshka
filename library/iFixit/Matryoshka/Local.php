@@ -89,9 +89,9 @@ class Local extends Backend {
    public function delete($key) {
       $success = $this->backend->delete($key);
 
-      if ($success) {
-         unset($this->cache[$key]);
-      }
+      // Always unset the local version because the key may have existed on
+      // the backend.
+      unset($this->cache[$key]);
 
       return $success;
    }
