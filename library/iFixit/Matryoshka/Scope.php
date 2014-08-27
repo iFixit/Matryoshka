@@ -22,15 +22,15 @@ class Scope extends KeyChange {
       return "{$prefix}$key";
    }
 
-   public function getScopePrefix() {
-      if ($this->scopePrefix === null) {
+   public function getScopePrefix($reset = false) {
+      if ($this->scopePrefix === null || $reset) {
          // TODO: This doesn't set an expiration time. Make it user configurable?
          // TODO: This introduces a race condition between the miss and the
          // set.
          $this->scopePrefix = $this->backend->getAndSet($this->getScopeKey(),
           function() {
             return substr(md5(microtime()), 0, 4);
-         });
+         }, 0, $reset);
       }
 
       return $this->scopePrefix;
@@ -40,15 +40,17 @@ class Scope extends KeyChange {
       return $this->scopeName;
    }
 
+   /**
+    * Deletes the scope which effectively invalidates all cache entries under
+    * this scope.
+    *
+    * @return true on success.
+    */
    public function deleteScope() {
-      // TODO: This could probably set a new value in place rather than
-      // deleting the current one.
-      if ($this->backend->delete($this->getScopeKey())) {
-         $this->scopePrefix = null;
-         return true;
-      } else {
-         return false;
-      }
+      // Delete the scope by setting a new value for it.
+      $prefix = $this->getScopePrefix($reset = true);
+
+      return $prefix !== self::MISS;
    }
 
    private function getScopeKey() {
