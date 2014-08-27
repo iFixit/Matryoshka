@@ -24,9 +24,6 @@ class Scope extends KeyChange {
 
    public function getScopePrefix($reset = false) {
       if ($this->scopePrefix === null || $reset) {
-         // TODO: This doesn't set an expiration time. Make it user configurable?
-         // TODO: This introduces a race condition between the miss and the
-         // set.
          $this->scopePrefix = $this->backend->getAndSet($this->getScopeKey(),
           function() {
             return substr(md5(microtime()), 0, 4);
