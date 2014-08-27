@@ -29,6 +29,14 @@ class Enable extends Backend {
       }
    }
 
+   public function setMultiple(array $values, $expiration = 0) {
+      if ($this->setsEnabled) {
+         return $this->backend->setMultiple($values, $expiration);
+      } else {
+         return false;
+      }
+   }
+
    public function add($key, $value, $expiration = 0) {
       if ($this->setsEnabled) {
          return $this->backend->add($key, $value, $expiration);

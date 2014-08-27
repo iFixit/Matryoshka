@@ -21,6 +21,14 @@ class Ephemeral extends Backend {
       return true;
    }
 
+   public function setMultiple(array $values, $expiration = 0) {
+      foreach ($values as $key => $value) {
+         $this->cache[$key] = $value;
+      }
+
+      return true;
+   }
+
    public function add($key, $value, $expiration = 0) {
       // TODO: This doesn't use the expiration time at all.
       if (!array_key_exists($key, $this->cache)) {

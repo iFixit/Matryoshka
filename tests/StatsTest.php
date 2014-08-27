@@ -13,6 +13,8 @@ class StatsTest extends AbstractBackendTest {
       $backend = $this->getBackend();
       list($key, $value) = $this->getRandomKeyValue();
       list($key2, $value2) = $this->getRandomKeyValue();
+      list($key3, $value3) = $this->getRandomKeyValue();
+      list($key4, $value4) = $this->getRandomKeyValue();
 
       foreach ($backend->getStats() as $stat => $value) {
          $this->assertSame(0, $value, $stat);
@@ -22,6 +24,7 @@ class StatsTest extends AbstractBackendTest {
 
       $backend->add($key, $value);
       $backend->set($key, 5);
+      $backend->setMultiple([$key3 => '', $key4 => '']);
       $backend->increment($key, 1);
       $backend->decrement($key, 1);
       $backend->get($key);
@@ -32,7 +35,7 @@ class StatsTest extends AbstractBackendTest {
       $maxTime = $end - $start;
 
       foreach ($backend->getStats() as $stat => $value) {
-         if ($stat == 'getMultiple_key_count') {
+         if ($stat == 'getMultiple_key_count' || $stat == 'setMultiple_key_count') {
             $this->assertSame(2, $value, $stat);
          } else if (strpos($stat, '_count') !== false) {
             $this->assertSame(1, $value, $stat);

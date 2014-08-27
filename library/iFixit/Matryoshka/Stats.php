@@ -16,6 +16,9 @@ class Stats extends Backend {
       $this->stats = [
          'set_count' => 0,
          'set_time' => 0,
+         'setMultiple_count' => 0,
+         'setMultiple_key_count' => 0,
+         'setMultiple_time' => 0,
          'add_count' => 0,
          'add_time' => 0,
          'increment_count' => 0,
@@ -45,6 +48,18 @@ class Stats extends Backend {
 
       $this->stats['set_count']++;
       $this->stats['set_time'] += $end - $start;
+
+      return $value;
+   }
+
+   public function setMultiple(array $values, $expiration = 0) {
+      $start = microtime(true);
+      $value = $this->backend->setMultiple($values, $expiration);
+      $end = microtime(true);
+
+      $this->stats['setMultiple_count']++;
+      $this->stats['setMultiple_key_count'] += count($values);
+      $this->stats['setMultiple_time'] += $end - $start;
 
       return $value;
    }

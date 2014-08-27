@@ -17,6 +17,16 @@ abstract class KeyChange extends Backend {
       return $this->backend->set($this->changeKey($key), $value, $expiration);
    }
 
+   public function setMultiple(array $values, $expiration = 0) {
+      $changedKeyValues = [];
+
+      foreach ($values as $key => $value) {
+         $changedKeyValues[$this->changeKey($key)] = $value;
+      }
+
+      return $this->backend->setMultiple($changedKeyValues, $expiration);
+   }
+
    public function add($key, $value, $expiration = 0) {
       return $this->backend->add($this->changeKey($key), $value, $expiration);
    }
