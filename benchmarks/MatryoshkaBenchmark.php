@@ -252,14 +252,6 @@ class MatryoshkaBenchmark {
          'MemArrayHierarchy' => new Matryoshka\Hierarchy([
             new Matryoshka\Ephemeral()
          ]),
-         'MemArrayMemcacheHier' => new Matryoshka\Hierarchy([
-            new Matryoshka\Ephemeral(),
-            Matryoshka\Memcache::create(self::getMemcache())
-         ]),
-         'LocalMemcache' => new Matryoshka\Local(
-            Matryoshka\Memcache::create(self::getMemcache())
-         ),
-         'Memcache' => Matryoshka\Memcache::create(self::getMemcache()),
          'MemArray' => new Matryoshka\Ephemeral(),
          'PrefixMemArray' => new Matryoshka\Prefix(new Matryoshka\Ephemeral(), 'prefix'),
          'ScopeMemArray' => new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope'),
@@ -267,6 +259,19 @@ class MatryoshkaBenchmark {
          'MultiScope10MemArray' => self::getMultiScope(new Matryoshka\Ephemeral(), 10),
          'StatsMemArray' => new Matryoshka\Stats(new Matryoshka\Ephemeral())
       ];
+
+      if (Matryoshka\Memcache::isAvailable()) {
+         $allBackends['MemArrayMemcacheHier'] = new Matryoshka\Hierarchy([
+            new Matryoshka\Ephemeral(),
+            Matryoshka\Memcache::create(self::getMemcache())
+         ]);
+         $allBackends['LocalMemcache'] = new Matryoshka\Local(
+            Matryoshka\Memcache::create(self::getMemcache())
+         );
+         $allBackends['Memcache'] = Matryoshka\Memcache::create(
+            self::getMemcache()
+         );
+      }
 
       if ($regex !== null) {
          foreach ($allBackends as $type => $backend) {
