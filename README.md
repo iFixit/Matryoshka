@@ -32,6 +32,19 @@ $cache->getsEnable = false;
 $cache->get('key'); // Always results in a miss.
 ```
 
+### Enable
+
+Modifies all expiration times using a callback for the new value.
+
+```php
+$changeFunc = function($expiration) {
+   // Double all expiration times.
+   return $expiration * 2;
+};
+$cache = new Matryoshka\ExpirationChange($backend, $changeFunc);
+$cache->set('key', 'value', 10); // Results in an expiration time of 20.
+```
+
 ### Hierarchy
 
 Sets caches in a hierarchy to prefer faster caches that get filled in by slower caches.

@@ -257,7 +257,13 @@ class MatryoshkaBenchmark {
          'ScopeMemArray' => new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope'),
          'MultiScope2MemArray' => self::getMultiScope(new Matryoshka\Ephemeral(), 2),
          'MultiScope10MemArray' => self::getMultiScope(new Matryoshka\Ephemeral(), 10),
-         'StatsMemArray' => new Matryoshka\Stats(new Matryoshka\Ephemeral())
+         'StatsMemArray' => new Matryoshka\Stats(new Matryoshka\Ephemeral()),
+         'ExprChangeMemArray' => new Matryoshka\ExpirationChange(
+            new Matryoshka\Ephemeral(),
+            function($expiration) {
+               return $expiration * 2;
+            }
+         )
       ];
 
       if (Matryoshka\Memcache::isAvailable()) {
@@ -310,6 +316,7 @@ backends.
    --benchmark=<regex> Filters benchmarks based on the regex.
 
    --count=<count> Number of operations to perform/benchmark/backend.
+
 HELP;
       exit(0);
    }
