@@ -32,7 +32,17 @@ $cache->getsEnable = false;
 $cache->get('key'); // Always results in a miss.
 ```
 
-### Enable
+### Ephemeral
+
+Caches values in a local memory array that lasts the duration of the PHP process.
+
+```php
+$cache = new Matryoshka\Ephemeral();
+$cache->set('key', 'value');
+$value = $cache->get('key');
+```
+
+### ExpirationChange
 
 Modifies all expiration times using a callback for the new value.
 
@@ -107,14 +117,23 @@ $cache = Matryoshka\Memcache::create($memcache);
 $value = $cache->get('key');
 ```
 
-### Ephemeral
+### MultiScope
 
-Caches values in a local memory array that lasts the duration of the PHP process.
+Uses multiple scopes to store keys.
 
 ```php
-$cache = new Matryoshka\Ephemeral();
-$cache->set('key', 'value');
-$value = $cache->get('key');
+$scope1 = new Matryoshka\Scope($remoteMemcache, 'scope1');
+$scope2 = new Matryoshka\Scope($remoteMemcache, 'scope2');
+$multiScope = new Matryoshka\MultiScope($localMemcache, [
+   $scope1,
+   $scope2
+]);
+// Stores the value on the local memcached backend but scope it to
+// scope1 and scope2 which are stored on the remote memcache instance.
+$multiScope->set('key', 'value');
+$scope1->deleteScope();
+// This results in a miss because one of the scopes has been deleted.
+$value = $multiScope->get('key');
 ```
 
 ### Prefix
