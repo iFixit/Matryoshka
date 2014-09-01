@@ -9,7 +9,8 @@ class MultiScopeTest extends AbstractBackendTest {
       return new Matryoshka\MultiScope(
          new Matryoshka\Ephemeral(),
          [
-            new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope')
+            new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope1'),
+            new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope2')
          ]
       );
    }
@@ -53,5 +54,15 @@ class MultiScopeTest extends AbstractBackendTest {
       $flippedMultiScope->delete($key3);
       $this->assertNull($flippedMultiScope->get($key3));
       $this->assertNull($multiScope->get($key3));
+   }
+
+   public function testSingleScope() {
+      $memArray = new Matryoshka\Ephemeral();
+      $scope = new Matryoshka\Scope($memArray, 'scope');
+      $multiScope = new Matryoshka\MultiScope($memArray, [$scope]);
+
+      // The MultiScope key should be the same as the sole scope that it
+      // contains.
+      $this->assertSame($scope->changeKey('key'), $multiScope->changeKey('key'));
    }
 }

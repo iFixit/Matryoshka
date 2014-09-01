@@ -33,7 +33,7 @@ class MultiScope extends KeyChange {
       $scopedKey = '';
 
       foreach ($this->scopes as $scope) {
-         $scopedKey .= $scope->getScopePrefix() . '-';
+         $scopedKey .= $scope->getScopePrefix();
       }
 
       return "{$scopedKey}{$key}";

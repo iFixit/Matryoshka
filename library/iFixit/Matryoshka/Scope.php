@@ -24,10 +24,12 @@ class Scope extends KeyChange {
 
    public function getScopePrefix($reset = false) {
       if ($this->scopePrefix === null || $reset) {
-         $this->scopePrefix = $this->backend->getAndSet($this->getScopeKey(),
+         $scopeValue = $this->backend->getAndSet($this->getScopeKey(),
           function() {
             return substr(md5(microtime()), 0, 8);
          }, 0, $reset);
+
+         $this->scopePrefix = "{$scopeValue}-";
       }
 
       return $this->scopePrefix;
