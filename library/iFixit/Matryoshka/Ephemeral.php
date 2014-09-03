@@ -6,6 +6,8 @@ use iFixit\Matryoshka;
 
 /**
  * Simple in-memory PHP array to cache objects for this process.
+ *
+ * Note: The expiration time is ignored completely.
  */
 class Ephemeral extends Backend {
    protected $cache;
@@ -15,7 +17,6 @@ class Ephemeral extends Backend {
    }
 
    public function set($key, $value, $expiration = 0) {
-      // TODO: This doesn't use the expiration time at all.
       $this->cache[$key] = $value;
 
       return true;
@@ -30,7 +31,6 @@ class Ephemeral extends Backend {
    }
 
    public function add($key, $value, $expiration = 0) {
-      // TODO: This doesn't use the expiration time at all.
       if (!array_key_exists($key, $this->cache)) {
          $this->cache[$key] = $value;
          return true;
