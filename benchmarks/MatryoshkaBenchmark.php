@@ -225,7 +225,7 @@ class MatryoshkaBenchmark {
    private static function getDisabled(Matryoshka\Backend $backend) {
       $disabled = new Matryoshka\Enable($backend);
       $disabled->getsEnabled = false;
-      $disabled->setsEnabled = false;
+      $disabled->writesEnabled = false;
       $disabled->deletesEnabled = false;
 
       return $disabled;

@@ -13,10 +13,10 @@ class EnableTest extends AbstractBackendTest {
       $backend = $this->getBackend();
       list($key, $value) = $this->getRandomKeyValue();
 
-      $backend->setsEnabled = false;
+      $backend->writesEnabled = false;
       $this->assertFalse($backend->set($key, $value));
       $this->assertNull($backend->get($key));
-      $backend->setsEnabled = true;
+      $backend->writesEnabled = true;
 
       $this->assertTrue($backend->set($key, $value));
       $this->assertSame($value, $backend->get($key));
