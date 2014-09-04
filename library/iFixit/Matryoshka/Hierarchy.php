@@ -43,8 +43,7 @@ class Hierarchy extends Backend {
          return false;
       }
 
-      $numBackends = count($this->backends);
-      $lastBackend = $this->backends[$numBackends - 1];
+      $lastBackend = $this->backends[$this->backendCount - 1];
       $newValue = $lastBackend->increment($key, $amount, $expiration);
 
       if ($newValue === false) {
@@ -52,7 +51,7 @@ class Hierarchy extends Backend {
       }
 
       // Set the value on all the other backends.
-      for ($i = 0; $i < $numBackends - 1; $i++) {
+      for ($i = 0; $i < $this->backendCount - 1; $i++) {
          $this->backends[$i]->set($key, $newValue, $expiration);
       }
 
