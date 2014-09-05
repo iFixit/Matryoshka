@@ -9,7 +9,7 @@ use iFixit\Matryoshka;
  *
  * $cache = new Matryoshka\Hierarchy([
  *    new Matryoshka\Ephemeral(),
- *    new Matryoshka\Memcache()
+ *    new Matryoshka\SlowUserProvidedBackend()
  * ]);
  */
 class Local extends Backend {
