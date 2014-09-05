@@ -103,7 +103,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
           "Amount: $amount");
       }
 
-      // This comes out as a string for Membackend so we must use
+      // This comes out as a string for Memcache so we must use
       // assertEquals rather than assertSame.
       $this->assertEquals($currentValue, $backend->get($key1));
 
@@ -148,7 +148,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
           "Amount: $amount");
       }
 
-      // This comes out as a string for Membackend so we must use
+      // This comes out as a string for Memcache so we must use
       // assertEquals rather than assertSame.
       $this->assertEquals($currentValue, $backend->get($key1));
 
