@@ -22,8 +22,8 @@ class MultiScope extends KeyChange {
       $this->sortScopes();
    }
 
-   public function addScope(Scope $scoped) {
-      $this->scopes[] = $scoped;
+   public function addScope(Scope $scope) {
+      $this->scopes[] = $scope;
       $this->sortScopes();
 
       return $this;
