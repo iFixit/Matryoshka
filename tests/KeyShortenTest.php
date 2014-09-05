@@ -37,4 +37,13 @@ class KeyShortenTest extends AbstractBackendTest {
           substr($shortenedKey, 0, $intactKeyLength));
       }
    }
+
+   public function testKeyShortenLength() {
+      try {
+         new Matryoshka\KeyShorten(new TestEphemeral(), 5);
+         $this->fail("Doesn't throw InvalidArgumentException");
+      } catch (InvalidArgumentException $e) {
+         // Do nothing.
+      }
+   }
 }

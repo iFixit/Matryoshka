@@ -14,6 +14,11 @@ class KeyShorten extends KeyChange {
    private $maxLength;
 
    public function __construct(Backend $backend, $maxLength) {
+      if ($maxLength < self::MD5_STRLEN) {
+         throw new \InvalidArgumentException(
+          'Max length must be larger than ' . self::MD5_STRLEN);
+      }
+
       parent::__construct($backend);
 
       $this->maxLength = $maxLength;
