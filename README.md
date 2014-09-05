@@ -59,6 +59,8 @@ $cache->set('key', 'value', 10); // Results in an expiration time of 20.
 
 Sets caches in a hierarchy to prefer faster caches that get filled in by slower caches.
 
+Note: This Backend is currently experimental due to its potentially unexpected behavior.
+
 ```php
 $cache = new Matryoshka\Hierarchy([
    new Matryoshka\Ephemeral(),

@@ -6,6 +6,10 @@ use iFixit\Matryoshka;
 
 /**
  * Cache hierarchy.
+ *
+ * Note: This Backend is currently experimental. There are many situations
+ * that result in nonobvious and unexpected behavior. Read the comments and
+ * take care before using this class.
  */
 class Hierarchy extends Backend {
    private $backends;
