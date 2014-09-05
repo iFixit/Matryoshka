@@ -41,30 +41,30 @@ abstract class KeyChange extends Backend {
    }
 
    public function getMultiple(array $keys) {
-      $prefixedKeys = [];
+      $changedKeys = [];
 
       foreach ($keys as $key => $id) {
-         $prefixedKeys[$this->changeKey($key)] = $id;
+         $changedKeys[$this->changeKey($key)] = $id;
       }
 
       // Ignore the missed values -- we will recompute them later.
-      list($found) = $this->backend->getMultiple($prefixedKeys);
+      list($found) = $this->backend->getMultiple($changedKeys);
 
-      // Take advantage of the guaranteed ordering of the keys to unprefix them.
+      // Take advantage of the guaranteed ordering of the keys to unchange them.
       $searchKeys = array_keys($keys);
       $foundKeys = array_keys($found);
-      $unPrefixedFound = [];
-      $unPrefixedMissed = [];
+      $unChangedFound = [];
+      $unChangedMissed = [];
 
       foreach ($searchKeys as $i => $searchKey) {
          $value = $found[$foundKeys[$i]];
-         $unPrefixedFound[$searchKey] = $value;
+         $unChangedFound[$searchKey] = $value;
          if ($value === self::MISS) {
-            $unPrefixedMissed[$searchKey] = $keys[$searchKey];
+            $unChangedMissed[$searchKey] = $keys[$searchKey];
          }
       }
 
-      return [$unPrefixedFound, $unPrefixedMissed];
+      return [$unChangedFound, $unChangedMissed];
    }
 
    public function delete($key) {
