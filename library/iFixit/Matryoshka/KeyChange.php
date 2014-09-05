@@ -9,6 +9,21 @@ abstract class KeyChange extends Backend {
 
    public abstract function changeKey($key);
 
+   /**
+    * Convert many keys at once. Note: $keys is a key => value mapping. This
+    * is just a default implementation that should be overrided by derived
+    * classes.
+    */
+   public function changeKeys(array $keys) {
+      $changedKeys = [];
+
+      foreach ($keys as $key => $value) {
+         $changedKeys[$this->changeKey($key)] = $value;
+      }
+
+      return $changedKeys;
+   }
+
    public function __construct(Backend $backend) {
       $this->backend = $backend;
    }
@@ -18,13 +33,7 @@ abstract class KeyChange extends Backend {
    }
 
    public function setMultiple(array $values, $expiration = 0) {
-      $changedKeyValues = [];
-
-      foreach ($values as $key => $value) {
-         $changedKeyValues[$this->changeKey($key)] = $value;
-      }
-
-      return $this->backend->setMultiple($changedKeyValues, $expiration);
+      return $this->backend->setMultiple($this->changeKeys($values), $expiration);
    }
 
    public function add($key, $value, $expiration = 0) {
@@ -41,14 +50,8 @@ abstract class KeyChange extends Backend {
    }
 
    public function getMultiple(array $keys) {
-      $changedKeys = [];
-
-      foreach ($keys as $key => $id) {
-         $changedKeys[$this->changeKey($key)] = $id;
-      }
-
       // Ignore the missed values -- we will recompute them later.
-      list($found) = $this->backend->getMultiple($changedKeys);
+      list($found) = $this->backend->getMultiple($this->changeKeys($keys));
 
       // Take advantage of the guaranteed ordering of the keys to unchange them.
       $searchKeys = array_keys($keys);

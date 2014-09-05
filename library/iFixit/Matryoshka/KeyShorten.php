@@ -31,4 +31,20 @@ class KeyShorten extends KeyChange {
 
       return substr($key, 0, $this->maxLength - self::MD5_STRLEN) . md5($key);
    }
+
+   public function changeKeys(array $keys) {
+      $changedKeys = [];
+
+      foreach ($keys as $key => $value) {
+         if (strlen($key) <= $this->maxLength) {
+            $newKey = $key;
+         } else {
+            $newKey = substr($key, 0, $this->maxLength - self::MD5_STRLEN) . md5($key);
+         }
+
+         $changedKeys[$newKey] = $value;
+      }
+
+      return $changedKeys;
+   }
 }

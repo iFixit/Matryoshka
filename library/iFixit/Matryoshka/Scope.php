@@ -19,7 +19,18 @@ class Scope extends KeyChange {
    public function changeKey($key) {
       $prefix = $this->getScopePrefix();
 
-      return "{$prefix}$key";
+      return "{$prefix}{$key}";
+   }
+
+   public function changeKeys(array $keys) {
+      $prefix = $this->getScopePrefix();
+      $changedKeys = [];
+
+      foreach ($keys as $key => $value) {
+         $changedKeys["{$prefix}{$key}"] = $value;
+      }
+
+      return $changedKeys;
    }
 
    public function getScopePrefix($reset = false) {

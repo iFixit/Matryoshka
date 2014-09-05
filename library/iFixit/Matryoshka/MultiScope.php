@@ -30,13 +30,30 @@ class MultiScope extends KeyChange {
    }
 
    public function changeKey($key) {
-      $scopedKey = '';
+      $scopePrefix = $this->getScopePrefix();
 
-      foreach ($this->scopes as $scope) {
-         $scopedKey .= $scope->getScopePrefix();
+      return "{$scopePrefix}{$key}";
+   }
+
+   public function changeKeys(array $keys) {
+      $scopePrefix = $this->getScopePrefix();
+      $changedKeys = [];
+
+      foreach ($keys as $key => $value) {
+         $changedKeys["{$scopePrefix}{$key}"] = $value;
       }
 
-      return "{$scopedKey}{$key}";
+      return $changedKeys;
+   }
+
+   private function getScopePrefix() {
+      $scopePrefix = '';
+
+      foreach ($this->scopes as $scope) {
+         $scopePrefix .= $scope->getScopePrefix();
+      }
+
+      return $scopePrefix;
    }
 
    private function sortScopes() {
