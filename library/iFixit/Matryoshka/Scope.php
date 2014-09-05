@@ -37,7 +37,7 @@ class Scope extends KeyChange {
       if ($this->scopePrefix === null || $reset) {
          $scopeValue = $this->backend->getAndSet($this->getScopeKey(),
           function() {
-            return substr(md5(microtime()), 0, 8);
+            return substr(md5(microtime() . $this->scopeName), 0, 8);
          }, 0, $reset);
 
          $this->scopePrefix = "{$scopeValue}-";
