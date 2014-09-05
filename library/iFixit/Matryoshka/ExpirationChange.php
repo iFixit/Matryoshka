@@ -36,6 +36,11 @@ class ExpirationChange extends Backend {
        call_user_func($this->changeExpiration, $expiration));
    }
 
+   public function decrement($key, $amount = 1, $expiration = 0) {
+      return $this->backend->decrement($key, $amount,
+       call_user_func($this->changeExpiration, $expiration));
+   }
+
    public function get($key) {
       return $this->backend->get($key);
    }

@@ -50,6 +50,13 @@ class Ephemeral extends Backend {
       }
    }
 
+   /**
+    * Just delegate to increment to do the work.
+    */
+   public function decrement($key, $amount = 1, $expiration = 0) {
+      return $this->increment($key, -$amount, $expiration);
+   }
+
    public function get($key) {
       if (array_key_exists($key, $this->cache)) {
          return $this->cache[$key];

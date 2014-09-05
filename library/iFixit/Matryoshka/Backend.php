@@ -45,6 +45,14 @@ abstract class Backend {
    public abstract function increment($key, $amount = 1, $expiration = 0);
 
    /**
+    * Same as increment but subtracts the amount rather than adding it. Some
+    * backends have different rules for valid values and ranges.
+    *
+    * @return the updated value, or false on failure
+    */
+   public abstract function decrement($key, $amount = 1, $expiration = 0);
+
+   /**
     * Retrieves the value associated with the key.
     *
     * @return the value or null on failure or if it is not found
@@ -159,15 +167,5 @@ abstract class Backend {
       }
 
       return $success;
-   }
-
-   /**
-    * Same as increment but subtracts the amount rather than adding it. Some
-    * backends have different rules for valid values and ranges.
-    *
-    * @return the updated value, or false on failure
-    */
-   public function decrement($key, $amount = 1, $expiration = 0) {
-      return $this->increment($key, -$amount, $expiration);
    }
 }

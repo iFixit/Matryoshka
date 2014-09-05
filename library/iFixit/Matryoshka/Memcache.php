@@ -36,6 +36,8 @@ class Memcache extends Backend {
    }
 
    public function increment($key, $amount = 1, $expiration = 0) {
+      // Memcache doesn't support negative amounts for decrement or increment
+      // so send it to decrement to handle it.
       if ($amount < 0) {
          return $this->decrement($key, -$amount, $expiration);
       }
@@ -55,6 +57,8 @@ class Memcache extends Backend {
    }
 
    public function decrement($key, $amount = 1, $expiration = 0) {
+      // Memcache doesn't support negative amounts for decrement or increment
+      // so send it to increment to handle it.
       if ($amount < 0) {
          return $this->increment($key, -$amount, $expiration);
       }

@@ -45,6 +45,11 @@ abstract class KeyChange extends Backend {
        $expiration);
    }
 
+   public function decrement($key, $amount = 1, $expiration = 0) {
+      return $this->backend->decrement($this->changeKey($key), $amount,
+       $expiration);
+   }
+
    public function get($key) {
       return $this->backend->get($this->changeKey($key));
    }

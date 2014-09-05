@@ -38,17 +38,25 @@ class Hierarchy extends Backend {
       return $success;
    }
 
+   public function increment($key, $amount = 1, $expiration = 0) {
+      return $this->doIncrement(__FUNCTION__, $key, $amount, $expiration);
+   }
+
+   public function decrement($key, $amount = 1, $expiration = 0) {
+      return $this->doIncrement(__FUNCTION__, $key, $amount, $expiration);
+   }
+
    // TODO: This gets kinda awkward. This assumes that the last backend is the
    // authoritative source of the value so the incremented value is set on all
    // of the other backends but the results of those sets aren't verified. It
    // also resets the expiration time.
-   public function increment($key, $amount = 1, $expiration = 0) {
+   private function doIncrement($method, $key, $amount = 1, $expiration = 0) {
       if (empty($this->backends)) {
          return false;
       }
 
       $lastBackend = $this->backends[$this->backendCount - 1];
-      $newValue = $lastBackend->increment($key, $amount, $expiration);
+      $newValue = $lastBackend->$method($key, $amount, $expiration);
 
       if ($newValue === false) {
          return false;

@@ -52,6 +52,14 @@ class Enable extends Backend {
       }
    }
 
+   public function decrement($key, $amount = 1, $expiration = 0) {
+      if ($this->writesEnabled) {
+         return $this->backend->decrement($key, $amount, $expiration);
+      } else {
+         return false;
+      }
+   }
+
    public function get($key) {
       if ($this->getsEnabled) {
          return $this->backend->get($key);

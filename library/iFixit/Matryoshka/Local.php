@@ -59,6 +59,16 @@ class Local extends Backend {
       return $result;
    }
 
+   public function decrement($key, $amount = 1, $expiration = 0) {
+      $result = $this->backend->decrement($key, $amount, $expiration);
+
+      if ($result !== false) {
+         $this->cache[$key] = $result;
+      }
+
+      return $result;
+   }
+
    public function get($key) {
       if (array_key_exists($key, $this->cache)) {
          return $this->cache[$key];

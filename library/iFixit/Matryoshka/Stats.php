@@ -88,7 +88,7 @@ class Stats extends Backend {
 
    public function decrement($key, $amount = 1, $expiration = 0) {
       $start = microtime(true);
-      $value = $this->backend->increment($key, -$amount, $expiration);
+      $value = $this->backend->decrement($key, $amount, $expiration);
       $end = microtime(true);
 
       $this->stats['decrement_count']++;
