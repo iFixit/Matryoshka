@@ -272,6 +272,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertSame(2, $numMisses);
 
       $numMisses = -1;
+      $newKeys = [];
       $this->assertSame($keyToValue,
        $backend->getAndSetMultiple($keys, $callback));
       $this->assertSame(-1, $numMisses);
@@ -281,10 +282,12 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
             $numMisses = count($missing);
             return [];
          },
-         'invalid values' => function($missing) use (&$numMisses) {
+         'invalid values' => function($missing) use (&$numMisses, &$newKeys) {
             $numMisses = count($missing);
             list($key1, $value1) = $this->getRandomKeyValue();
             list($key2, $value2) = $this->getRandomKeyValue();
+
+            $newKeys = [$key1, $key2];
 
             return [
                $key1 => $value1,
@@ -304,12 +307,18 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
          ];
 
          $numMisses = -1;
+         $newKeys = [];
          $result = $backend->getAndSetMultiple($keys, $emptyCallback);
          $this->assertEmpty($result);
          $this->assertSame(count($keys), $numMisses);
 
          // Make sure the false keys aren't set.
          foreach ($keys as $key => $id) {
+            $this->assertNull($backend->get($key));
+         }
+
+         // Make sure the new keys aren't set.
+         foreach ($newKeys as $key) {
             $this->assertNull($backend->get($key));
          }
       }
