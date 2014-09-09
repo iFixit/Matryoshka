@@ -106,7 +106,12 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
           "Amount: $amount");
       }
 
-      $this->assertSame($currentValue, $backend->get($key1));
+      $realValue = $backend->get($key1);
+      if (get_called_class() === 'MemcacheTest') {
+         // HHVM's memcache get returns a string rather than an integer.
+         $realValue = (int)$realValue;
+      }
+      $this->assertSame($currentValue, $realValue);
 
       $this->assertTrue($backend->delete($key1));
       $this->assertSame(7, $backend->increment($key1, 7));
@@ -149,7 +154,12 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
           "Amount: $amount");
       }
 
-      $this->assertSame($currentValue, $backend->get($key1));
+      $realValue = $backend->get($key1);
+      if (get_called_class() === 'MemcacheTest') {
+         // HHVM's memcache get returns a string rather than an integer.
+         $realValue = (int)$realValue;
+      }
+      $this->assertSame($currentValue, $realValue);
 
       $this->assertTrue($backend->delete($key1));
 
