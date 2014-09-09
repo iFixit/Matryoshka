@@ -6,7 +6,7 @@ use iFixit\Matryoshka;
 
 class Memcache extends Backend {
    const FLAGS = MEMCACHE_COMPRESSED;
-   const MAX_KEY_LENGTH = 255;
+   const MAX_KEY_LENGTH = 250;
 
    private $memcache;
 
@@ -44,11 +44,13 @@ class Memcache extends Backend {
 
       $result = $this->memcache->increment($key, $amount);
 
-      if ($result !== false) {
+      // The docs say that false is returned if the key doesn't exist but some
+      // clients return 0.
+      if ($result !== false && $result !== 0) {
          return $result;
       }
 
-      if ($this->memcache->set($key, $amount, self::FLAGS, $expiration) !==
+      if ($this->memcache->set($key, $amount, 0, $expiration) !==
        false) {
          return $amount;
       } else {
@@ -75,7 +77,8 @@ class Memcache extends Backend {
    }
 
    public function getMultiple(array $keys) {
-      $hits = $this->memcache->get(array_keys($keys));
+      // Default to an empty array in case no keys were found.
+      $hits = $this->memcache->get(array_keys($keys)) ?: [];
 
       $found = [];
       $missed = [];
