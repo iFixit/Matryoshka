@@ -347,6 +347,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $newValue = "{$value}-new";
       $this->assertNull($backend->get($newKey));
       $this->assertTrue($backend->set($newKey, $newValue));
+      $this->assertSame($newValue, $backend->get($newKey));
    }
 
    protected function getRandomKeyValue() {

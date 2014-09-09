@@ -6,7 +6,7 @@ use iFixit\Matryoshka;
 
 class Memcache extends Backend {
    const FLAGS = MEMCACHE_COMPRESSED;
-   const MAX_KEY_LENGTH = 255;
+   const MAX_KEY_LENGTH = 250;
 
    private $memcache;
 
