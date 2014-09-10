@@ -87,7 +87,9 @@ abstract class Backend {
 
    /**
     * Wrapper around get and set that uses the provided callback to retrieve
-    * and populate the cache if the key is not found in the cache.
+    * and populate the cache if the key is not found in the cache. If
+    * $callback returns Backend::NULL, the corresponding set() call won't
+    * happen.
     *
     * @param $reset If true, always call the callback to reset the cache.
     *
