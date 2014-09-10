@@ -31,4 +31,30 @@ class LocalTest extends AbstractBackendTest {
       $cache->delete($key2);
       $this->assertNull($cache->get($key2));
    }
+
+   public function testLocalGetMultiple() {
+      $ephemeral = new Matryoshka\Ephemeral();
+      $cache = new Matryoshka\Local($ephemeral);
+
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+
+      $ephemeral->set($key1, $value1);
+
+      list($found, $missing) = $cache->getMultiple(
+         [$key1 => 'key1',  $key2 => 'key2']);
+      $this->assertSame(
+         [$key1 => $value1, $key2 => null], $found);
+      $this->assertSame(
+         [$key2 => 'key2'], $missing);
+
+      $ephemeral->set($key2, $value2);
+
+      list($found, $missing) = $cache->getMultiple(
+         [$key1 => 'key1',  $key2 => 'key2']);
+      $this->assertSame(
+         [$key1 => $value1, $key2 => $value2], $found);
+      $this->assertSame(
+         [], $missing);
+   }
 }
