@@ -11,7 +11,7 @@ class Memcache extends Backend {
    private $memcache;
 
    public static function isAvailable() {
-      return class_exists('Memcache', false);
+      return class_exists('\Memcache', false);
    }
 
    /**
@@ -20,7 +20,7 @@ class Memcache extends Backend {
     * truncated.
     */
    public static function create(\Memcache $memcache) {
-      return new KeyShorten(new Memcache($memcache), self::MAX_KEY_LENGTH);
+      return new KeyShorten(new \iFixit\Matryoshka\Memcache($memcache), self::MAX_KEY_LENGTH);
    }
 
    private function __construct(\Memcache $memcache) {
