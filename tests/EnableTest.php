@@ -31,7 +31,7 @@ class EnableTest extends AbstractBackendTest {
       $backend->deletesEnabled = true;
    }
 
-   public function testEnabledGetMultiple() {
+   public function testEnabledGetSetMultiple() {
       $backend = $this->getBackend();
       list($key1, $value1, $id1) = $this->getRandomKeyValueId();
       list($key2, $value2, $id2) = $this->getRandomKeyValueId();
@@ -41,10 +41,25 @@ class EnableTest extends AbstractBackendTest {
          $key2 => $id2
       ];
 
-      // Get expected return value with all misses.
-      $expected = $backend->getMultiple($keys);
+      $expectedMisses = $backend->getMultiple($keys);
+      $expected = [
+         $key1 => $value1,
+         $key2 => $value2
+      ];
 
+      $backend->writesEnabled = false;
+      $backend->setMultiple($expected);
+      $this->assertSame($expectedMisses, $backend->getMultiple($keys));
+
+      $backend->writesEnabled = true;
+      $backend->setMultiple($expected);
+      $this->assertSame($expected, $backend->getMultiple($keys)[0]);
+
+      // Test getsEnabled
       $backend->getsEnabled = false;
-      $this->assertSame($expected, $backend->getMultiple($keys));
+      $this->assertSame($expectedMisses, $backend->getMultiple($keys));
+
+      $backend->getsEnabled = true;
+      $this->assertSame($expected, $backend->getMultiple($keys)[0]);
    }
 }
