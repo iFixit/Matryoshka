@@ -14,6 +14,21 @@ class Prefix extends KeyChange {
    }
 
    public function changeKey($key) {
-      return $this->prefix . $key;
+      return $this->getPrefix() . $key;
+   }
+
+   public function changeKeys(array $keys) {
+      $prefix = $this->getPrefix();
+      $changedKeys = [];
+
+      foreach ($keys as $key => $value) {
+         $changedKeys["{$prefix}{$key}"] = $value;
+      }
+
+      return $changedKeys;
+   }
+
+   public function getPrefix() {
+      return $this->prefix;
    }
 }

@@ -4,33 +4,22 @@ namespace iFixit\Matryoshka;
 
 use iFixit\Matryoshka;
 
-class Scope extends KeyChange {
+class Scope extends Prefix {
    private $backend;
    private $scopeName;
    private $scopePrefix;
 
    public function __construct(Backend $backend, $scopeName) {
-      parent::__construct($backend);
+      // The prefix we pass along to the Prefix() constructor is never used, so 
+      // it doesn't matter.
+      parent::__construct($backend, /* $prefix = */ null);
 
       $this->scopeName = $scopeName;
       $this->backend = $backend;
    }
 
-   public function changeKey($key) {
-      $prefix = $this->getScopePrefix();
-
-      return "{$prefix}{$key}";
-   }
-
-   public function changeKeys(array $keys) {
-      $prefix = $this->getScopePrefix();
-      $changedKeys = [];
-
-      foreach ($keys as $key => $value) {
-         $changedKeys["{$prefix}{$key}"] = $value;
-      }
-
-      return $changedKeys;
+   public function getPrefix() {
+      return $this->scopePrefix ?: $this->getScopePrefix();
    }
 
    public function getScopePrefix($reset = false) {
