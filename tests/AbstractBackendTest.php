@@ -181,6 +181,24 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       }
    }
 
+   /**
+    * A negative increment/decrement should act as a positive
+    * decrement/increment.
+    */
+   public function testNegativeIncrementDecrement() {
+      $backend = $this->getBackend();
+      list($key) = $this->getRandomKeyValue();
+      $initialValue = 20;
+
+      $this->assertTrue($backend->set($key, $initialValue));
+
+      $this->assertSame($initialValue - 1, $backend->increment($key, -1));
+      $this->assertSame($initialValue - 1, $backend->get($key));
+
+      $this->assertSame($initialValue, $backend->decrement($key, -1));
+      $this->assertSame($initialValue, $backend->get($key));
+   }
+
    public function testgetAndSet() {
       $backend = $this->getBackend();
       list($key, $value) = $this->getRandomKeyValue();
