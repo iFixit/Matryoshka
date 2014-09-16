@@ -350,6 +350,11 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($newValue, $backend->get($newKey));
    }
 
+   public function testisAvailable() {
+      // Only available backends should be used for tests.
+      $this->assertTrue($this->getBackend()->isAvailable());
+   }
+
    protected function getRandomKeyValue() {
       return [
          'key-' . rand(),
