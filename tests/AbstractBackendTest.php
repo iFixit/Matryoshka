@@ -383,4 +383,8 @@ class TestEphemeral extends Matryoshka\Ephemeral {
    public function getCache() {
       return $this->cache;
    }
+
+   public function clear() {
+      $this->cache = [];
+   }
 }

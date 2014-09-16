@@ -38,6 +38,11 @@ class KeyShortenTest extends AbstractBackendTest {
          $this->assertSame(substr($originalKey, 0, $intactKeyLength),
           substr($shortenedKey, 0, $intactKeyLength));
       }
+
+      // Make sure that setMultiple produces the same keys.
+      $memoryCache->clear();
+      $cache->setMultiple(array_combine($keys, $keys));
+      $this->assertSame($cachedValues, $memoryCache->getCache());
    }
 
    public function testKeyShortenLength() {
