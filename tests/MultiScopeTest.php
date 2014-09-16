@@ -65,4 +65,31 @@ class MultiScopeTest extends AbstractBackendTest {
       // contains.
       $this->assertSame($scope->changeKey('key'), $multiScope->changeKey('key'));
    }
+
+   public function testAddScope() {
+      $ephemeral = new Matryoshka\Ephemeral();
+      $scopes = [
+         new Matryoshka\Scope($ephemeral, 'scope1'),
+         new Matryoshka\Scope($ephemeral, 'scope2'),
+         new Matryoshka\Scope($ephemeral, 'scope3')
+      ];
+      list($key, $value) = $this->getRandomKeyValue();
+      $constructorMultiScope = new Matryoshka\MultiScope($ephemeral, $scopes);
+
+      $this->assertTrue($constructorMultiScope->set($key, $value));
+
+      // Should be the same as providing them all in the constructor.
+      $addMultiScope = new Matryoshka\MultiScope($ephemeral, []);
+      foreach ($scopes as $scope) {
+         $addMultiScope->addScope($scope);
+      }
+      $this->assertSame($addMultiScope->get($key), $value);
+
+      // The order they are added shouldn't matter.
+      $reverseAddMultiScope = new Matryoshka\MultiScope($ephemeral, []);
+      foreach (array_reverse($scopes) as $scope) {
+         $reverseAddMultiScope->addScope($scope);
+      }
+      $this->assertSame($reverseAddMultiScope->get($key), $value);
+   }
 }
