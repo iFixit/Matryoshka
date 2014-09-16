@@ -12,14 +12,16 @@ class KeyShortenTest extends AbstractBackendTest {
    public function testKeyShorten() {
       $maxLength = 50;
       $intactKeyLength = $maxLength - Matryoshka\KeyShorten::MD5_STRLEN;
+      list($key) = $this->getRandomKeyValue();
+      $longKey = str_repeat($key, 10);
       $memoryCache = new TestEphemeral();
       $cache = new Matryoshka\KeyShorten($memoryCache, $maxLength);
 
       $keys = [
          'short',
-         str_repeat('a', $maxLength),
-         str_repeat('a', $maxLength + 1),
-         str_repeat('a', $maxLength * 10)
+         substr($longKey, 0, $maxLength),
+         substr($longKey, 0, $maxLength + 1),
+         substr($longKey, 0, $maxLength * 10),
       ];
 
       foreach ($keys as $key) {
