@@ -14,7 +14,7 @@ use iFixit\Matryoshka;
  */
 class Local extends Backend {
    private $backend;
-   private $cache;
+   protected $cache;
 
    public function __construct(Backend $backend) {
       $this->backend = $backend;

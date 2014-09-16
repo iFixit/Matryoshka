@@ -362,6 +362,16 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       ];
    }
 
+   protected function getRandomKeyValues($count = 5) {
+      $keys = [];
+
+      for ($i = 0; $i < $count; $i++) {
+         $keys['key-' . rand()] = 'value-' . rand();
+      }
+
+      return $keys;
+   }
+
    protected function getRandomKeyValueId() {
       return [
          'key-' . rand(),
@@ -386,5 +396,11 @@ class TestEphemeral extends Matryoshka\Ephemeral {
 
    public function clear() {
       $this->cache = [];
+   }
+}
+
+class TestLocal extends Matryoshka\Local {
+   public function getCache() {
+      return $this->cache;
    }
 }
