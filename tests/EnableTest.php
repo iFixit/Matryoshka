@@ -16,6 +16,15 @@ class EnableTest extends AbstractBackendTest {
       $backend->writesEnabled = false;
       $this->assertFalse($backend->set($key, $value));
       $this->assertNull($backend->get($key));
+
+      $this->assertFalse($backend->add($key, $value));
+      $this->assertNull($backend->get($key));
+
+      $this->assertFalse($backend->increment($key));
+      $this->assertNull($backend->get($key));
+
+      $this->assertFalse($backend->decrement($key));
+      $this->assertNull($backend->get($key));
       $backend->writesEnabled = true;
 
       $this->assertTrue($backend->set($key, $value));
@@ -61,5 +70,31 @@ class EnableTest extends AbstractBackendTest {
 
       $backend->getsEnabled = true;
       $this->assertSame($expected, $backend->getMultiple($keys)[0]);
+   }
+
+   public function testEnabledSetMultiple() {
+      $backend = $this->getBackend();
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+
+      $backend->writesEnabled = false;
+
+      $this->assertFalse($backend->setMultiple([
+         $key1 => $value1,
+         $key2 => $value2
+      ]));
+
+      $this->assertNull($backend->get($key1));
+      $this->assertNull($backend->get($key2));
+
+      $backend->writesEnabled = true;
+
+      $this->assertTrue($backend->setMultiple([
+         $key1 => $value1,
+         $key2 => $value2
+      ]));
+
+      $this->assertSame($value1, $backend->get($key1));
+      $this->assertSame($value2, $backend->get($key2));
    }
 }
