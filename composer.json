@@ -1,5 +1,5 @@
 {
-   "name": "iFixit/Matryoshka",
+   "name": "ifixit/matryoshka",
    "description": "PHP Caching Library",
    "keywords": ["cache", "memcached"],
    "homepage": "https://github.com/iFixit/Matryoshka",
