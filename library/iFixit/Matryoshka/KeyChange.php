@@ -10,19 +10,13 @@ abstract class KeyChange extends Backend {
    public abstract function changeKey($key);
 
    /**
-    * Convert many keys at once. Note: $keys is a key => value mapping. This
-    * is just a default implementation that should be overrided by derived
-    * classes.
+    * Convert many keys at once.
+    *
+    * @param $keys An array of [key => id].
+    *
+    * @return An array of [changedKey => id].
     */
-   public function changeKeys(array $keys) {
-      $changedKeys = [];
-
-      foreach ($keys as $key => $value) {
-         $changedKeys[$this->changeKey($key)] = $value;
-      }
-
-      return $changedKeys;
-   }
+   public abstract function changeKeys(array $keys);
 
    public function __construct(Backend $backend) {
       $this->backend = $backend;
