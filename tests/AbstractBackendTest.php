@@ -368,6 +368,24 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($newValue, $backend->get($newKey));
    }
 
+   public function testvalidKeys() {
+      $backend = $this->getBackend();
+      // Just a bunch of special characters that shouldn't cause any problems.
+      $validChars = [
+         '`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',
+         '+', '=', '|', '\\', '[', '{', ']', '}', '<', ',', '>', '.', '?', '/',
+         '☃', ' ', "\n", "\r"
+      ];
+
+      foreach ($validChars as $char) {
+         list($key, $value) = $this->getRandomKeyValue();
+         $key .= $char;
+
+         $this->assertTrue($backend->set($key, $value));
+         $this->assertSame($value, $backend->get($key));
+      }
+   }
+
    public function testisAvailable() {
       // Only available backends should be used for tests.
       $this->assertTrue($this->getBackend()->isAvailable());
