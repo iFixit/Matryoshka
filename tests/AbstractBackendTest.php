@@ -377,10 +377,11 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
          '☃', ' ', "\n", "\r"
       ];
 
+      list($baseKey, $value) = $this->getRandomKeyValue();
       foreach ($validChars as $char) {
-         list($key, $value) = $this->getRandomKeyValue();
-         $key .= $char;
+         $key = $baseKey . $char;
 
+         $this->assertSame(null, $backend->get($key), "Value already exists for key with ascii char (" . ord($char) . ") $char.");
          $this->assertTrue($backend->set($key, $value));
          $this->assertSame($value, $backend->get($key));
       }
