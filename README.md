@@ -46,7 +46,8 @@ $value = $cache->get('key');
 
 ### Enable
 
-Wraps a cache and disables its `get`, `set`, or `delete` operations.
+A wrapper around a cache that allows *disabling* `get`, `set`, or `delete` operations.
+When an action is disabled the underlying backend is not modified nor accessed and false is returned.
 
 ```php
 $cache = new Matryoshka\Enable($backend = (new Matryoshka\Ephemeral()));
@@ -57,6 +58,7 @@ $cache->get('key'); // Always results in a miss.
 ### ExpirationChange
 
 Modifies all expiration times using a callback for the new value.
+This allows things like randomizing or scaling expiration times to decrease miss storms or improve hit ratios.
 
 ```php
 $changeFunc = function($expiration) {
@@ -70,6 +72,8 @@ $cache->set('key', 'value', 10); // Results in an expiration time of 20.
 ### KeyShorten
 
 Ensures that all keys are at most the specified length by shortening longer ones.
+Long keys are shortend by using md5 on the end of the string
+to ensure long strings with a common prefix don't map to the same key.
 
 ```php
 $cache = new Matryoshka\KeyShorten(
@@ -114,7 +118,7 @@ var_dump($cache->getStats());
 
 Sets caches in a hierarchy to prefer faster caches that get filled in by slower caches.
 
-Note: This Backend is currently experimental due to its potentially unexpected behavior.
+Note: This Backend is currently experimental due to some of its potentially unexpected behavior.
 
 ```php
 $cache = new Matryoshka\Hierarchy([
@@ -138,7 +142,7 @@ $value = $cache->getAndSet('key', function() {
 
 ### Local
 
-Caches all values in a local array so subsequent requests for the same key can be fulfilled faster.
+Caches all values from the specified backend in a local array so subsequent requests for the same key can be fulfilled faster.
 
 ```php
 $cache = new Matryoshka\Local(new Memcache());
@@ -160,15 +164,16 @@ Caches values in a scope that can be deleted to invalidate all cache entries und
 ```php
 $cache = new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
 $cache->set('key', 'value');
-$value = $cache->get('key');
+$value = $cache->get('key'); // => 'value'
 $cache->deleteScope();
 // This results in a miss because the scope has been deleted.
-$value = $cache->get('key');
+$value = $cache->get('key'); // => false
 ```
 
 ### MultiScope
 
-Uses multiple scopes to store keys.
+Uses multiple scopes to store keys. Stores the scope or scopes in one backend and the scoped values in another.
+This primarily allows storing a scope in a shared but slower-to-acccess backend (for easily deletion), while storing the values in a local and faster backend for speedy access.
 
 ```php
 $scope1 = new Matryoshka\Scope($remoteMemcache, 'scope1');
