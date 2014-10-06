@@ -11,7 +11,7 @@ Matryoshka is a caching library for PHP built around nesting components like [Ru
 The [Memcache] and [Memcached] PHP client libraries offer fairly low level access to [memcached servers].
 Matryoshka adds convenience functions to simplify common operations that aren't covered by the client libraries.
 Most of the functionality is provided by nesting `Backend`s.
-For example, prefixing cache keys is accomplished by nesting an existing `Backend` with a `Prefix` backend.
+For example, prefixing cache keys is accomplished by nesting an existing `Backend` within a `Prefix` backend.
 This philosophy results in very modular components that are easy to swap in and out and simplify testing.
 
 This concept is used to support key prefixing, disabling `get`s/`set`s/`delete`s, defining cache fallbacks in a hierarchy, storing values in clearable scope, and recording statistics.
@@ -46,10 +46,10 @@ $value = $cache->get('key');
 
 ### Enable
 
-Disables `get`, `set`, or `delete` operations.
+Wraps a cache and disables its `get`, `set`, or `delete` operations.
 
 ```php
-$cache = new Matryoshka\Enable(...);
+$cache = new Matryoshka\Enable($backend = (new Matryoshka\Ephemeral()));
 $cache->getsEnable = false;
 $cache->get('key'); // Always results in a miss.
 ```
@@ -139,7 +139,12 @@ $value = $cache->getAndSet('key', function() {
 ### Local
 
 Caches all values in a local array so subsequent requests for the same key can be fulfilled faster.
-It's faster version of:
+
+```php
+$cache = new Matryoshka\Local(new Memcache());
+```
+
+It's a faster version of:
 
 ```php
 $cache = new Matryoshka\Hierarchy([
