@@ -22,14 +22,16 @@ This concept is used to support key prefixing, disabling `get`s/`set`s/`delete`s
 
 ## Backends
 
-### Enable
+### Memcache
 
-Disables `get`, `set`, or `delete` operations.
+Wraps the [Memcache] client library.
 
 ```php
-$cache = new Matryoshka\Enable(...);
-$cache->getsEnable = false;
-$cache->get('key'); // Always results in a miss.
+$memcache = new Memcache();
+$memcache->pconnect('localhost', 11211);
+$cache = Matryoshka\Memcache::create($memcache);
+
+$value = $cache->get('key');
 ```
 
 ### Ephemeral
@@ -40,6 +42,16 @@ Caches values in a local memory array that lasts the duration of the PHP process
 $cache = new Matryoshka\Ephemeral();
 $cache->set('key', 'value');
 $value = $cache->get('key');
+```
+
+### Enable
+
+Disables `get`, `set`, or `delete` operations.
+
+```php
+$cache = new Matryoshka\Enable(...);
+$cache->getsEnable = false;
+$cache->get('key'); // Always results in a miss.
 ```
 
 ### ExpirationChange
@@ -53,6 +65,49 @@ $changeFunc = function($expiration) {
 };
 $cache = new Matryoshka\ExpirationChange($backend, $changeFunc);
 $cache->set('key', 'value', 10); // Results in an expiration time of 20.
+```
+
+### KeyShorten
+
+Ensures that all keys are at most the specified length by shortening longer ones.
+
+```php
+$cache = new Matryoshka\KeyShorten(
+   new Matryoshka\Ephemeral(),
+   $maxLength = 50
+);
+
+// Gets converted to: `long_key_that_need2552e62135d11e8d4233e2a51868132e`
+$cache->get("long_key_that_needs_to_be_shortened_by_just_a_little_bit");
+```
+
+### Prefix
+
+Prefixes all keys with a string.
+
+```php
+$cache = new Matryoshka\Prefix(new Matryoshka\Ephemeral(), 'prefix-');
+// The key ends up being "prefix-key".
+$cache->set('key', 'value');
+$value = $cache->get('key');
+```
+
+### Stats
+
+Records counts and timings for operations to be used for metrics.
+
+```php
+$cache = new Matryoshka\Stats(new Matryoshka\Ephemeral());
+$cache->set('key', 'value');
+$value = $cache->get('key');
+var_dump($cache->getStats());
+// array(
+//    'get_count' => 1,
+//    'get_time' => 0.007,
+//    'set_count' => 1
+//    'set_time' => 0.008,
+//    ...
+// )
 ```
 
 ### Hierarchy
@@ -81,20 +136,6 @@ $value = $cache->getAndSet('key', function() {
 }, 3600);
 ```
 
-### KeyShorten
-
-Ensures that all keys are at most the specified length by shortening longer ones.
-
-```php
-$cache = new Matryoshka\KeyShorten(
-   new Matryoshka\Ephemeral(),
-   $maxLength = 50
-);
-
-// Gets converted to: `long_key_that_need2552e62135d11e8d4233e2a51868132e`
-$cache->get("long_key_that_needs_to_be_shortened_by_just_a_little_bit");
-```
-
 ### Local
 
 Caches all values in a local array so subsequent requests for the same key can be fulfilled faster.
@@ -107,15 +148,16 @@ $cache = new Matryoshka\Hierarchy([
 ]);
 ```
 
-### Memcache
+### Scope
 
-Wraps the [Memcache] client library.
+Caches values in a scope that can be deleted to invalidate all cache entries under the scope.
 
 ```php
-$memcache = new Memcache();
-$memcache->pconnect('localhost', 11211);
-$cache = Matryoshka\Memcache::create($memcache);
-
+$cache = new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
+$cache->set('key', 'value');
+$value = $cache->get('key');
+$cache->deleteScope();
+// This results in a miss because the scope has been deleted.
 $value = $cache->get('key');
 ```
 
@@ -136,48 +178,6 @@ $multiScope->set('key', 'value');
 $scope1->deleteScope();
 // This results in a miss because one of the scopes has been deleted.
 $value = $multiScope->get('key');
-```
-
-### Prefix
-
-Prefixes all keys with a string.
-
-```php
-$cache = new Matryoshka\Prefix(new Matryoshka\Ephemeral(), 'prefix-');
-// The key ends up being "prefix-key".
-$cache->set('key', 'value');
-$value = $cache->get('key');
-```
-
-### Scope
-
-Caches values in a scope that can be deleted to invalidate all cache entries under the scope.
-
-```php
-$cache = new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
-$cache->set('key', 'value');
-$value = $cache->get('key');
-$cache->deleteScope();
-// This results in a miss because the scope has been deleted.
-$value = $cache->get('key');
-```
-
-### Stats
-
-Records counts and timings for operations to be used for metrics.
-
-```php
-$cache = new Matryoshka\Stats(new Matryoshka\Ephemeral());
-$cache->set('key', 'value');
-$value = $cache->get('key');
-var_dump($cache->getStats());
-// array(
-//    'get_count' => 1,
-//    'get_time' => 0.007,
-//    'set_count' => 1
-//    'set_time' => 0.008,
-//    ...
-// )
 ```
 
 ## Convenience Functions
