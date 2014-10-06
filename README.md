@@ -11,7 +11,7 @@ Matryoshka is a caching library for PHP built around nesting components like [Ru
 The [Memcache] and [Memcached] PHP client libraries offer fairly low level access to [memcached servers].
 Matryoshka adds convenience functions to simplify common operations that aren't covered by the client libraries.
 Most of the functionality is provided by nesting `Backend`s.
-For example, prefixing cache keys is accomplished by nesting an existing `Backend` with a `Prefix` backend.
+For example, prefixing cache keys is accomplished by nesting an existing `Backend` within a `Prefix` backend.
 This philosophy results in very modular components that are easy to swap in and out and simplify testing.
 
 This concept is used to support key prefixing, disabling `get`s/`set`s/`delete`s, defining cache fallbacks in a hierarchy, storing values in clearable scope, and recording statistics.
@@ -22,14 +22,16 @@ This concept is used to support key prefixing, disabling `get`s/`set`s/`delete`s
 
 ## Backends
 
-### Enable
+### Memcache
 
-Disables `get`, `set`, or `delete` operations.
+Wraps the [Memcache] client library.
 
 ```php
-$cache = new Matryoshka\Enable(...);
-$cache->getsEnable = false;
-$cache->get('key'); // Always results in a miss.
+$memcache = new Memcache();
+$memcache->pconnect('localhost', 11211);
+$cache = Matryoshka\Memcache::create($memcache);
+
+$value = $cache->get('key');
 ```
 
 ### Ephemeral
@@ -42,9 +44,21 @@ $cache->set('key', 'value');
 $value = $cache->get('key');
 ```
 
+### Enable
+
+A wrapper around a cache that allows *disabling* `get`, `set`, or `delete` operations.
+When an action is disabled the underlying backend is not modified nor accessed and `false` is returned.
+
+```php
+$cache = new Matryoshka\Enable($backend = (new Matryoshka\Ephemeral()));
+$cache->getsEnable = false;
+$cache->get('key'); // Always results in a miss.
+```
+
 ### ExpirationChange
 
 Modifies all expiration times using a callback for the new value.
+This allows things like randomizing or scaling expiration times to decrease miss storms or improve hit ratios.
 
 ```php
 $changeFunc = function($expiration) {
@@ -55,11 +69,56 @@ $cache = new Matryoshka\ExpirationChange($backend, $changeFunc);
 $cache->set('key', 'value', 10); // Results in an expiration time of 20.
 ```
 
+### KeyShorten
+
+Ensures that all keys are at most the specified length by shortening longer ones.
+Long keys are shortend by using `md5` on the end of the string
+to ensure long strings with a common prefix don't map to the same key.
+
+```php
+$cache = new Matryoshka\KeyShorten(
+   new Matryoshka\Ephemeral(),
+   $maxLength = 50
+);
+
+// Gets converted to: `long_key_that_need2552e62135d11e8d4233e2a51868132e`
+$cache->get("long_key_that_needs_to_be_shortened_by_just_a_little_bit");
+```
+
+### Prefix
+
+Prefixes all keys with a string.
+
+```php
+$cache = new Matryoshka\Prefix(new Matryoshka\Ephemeral(), 'prefix-');
+// The key ends up being "prefix-key".
+$cache->set('key', 'value');
+$value = $cache->get('key');
+```
+
+### Stats
+
+Records counts and timings for operations to be used for metrics.
+
+```php
+$cache = new Matryoshka\Stats(new Matryoshka\Ephemeral());
+$cache->set('key', 'value');
+$value = $cache->get('key');
+var_dump($cache->getStats());
+// array(
+//    'get_count' => 1,
+//    'get_time' => 0.007,
+//    'set_count' => 1
+//    'set_time' => 0.008,
+//    ...
+// )
+```
+
 ### Hierarchy
 
 Sets caches in a hierarchy to prefer faster caches that get filled in by slower caches.
 
-Note: This Backend is currently experimental due to its potentially unexpected behavior.
+Note: This Backend is currently experimental due to some of its potentially unexpected behavior.
 
 ```php
 $cache = new Matryoshka\Hierarchy([
@@ -81,24 +140,15 @@ $value = $cache->getAndSet('key', function() {
 }, 3600);
 ```
 
-### KeyShorten
-
-Ensures that all keys are at most the specified length by shortening longer ones.
-
-```php
-$cache = new Matryoshka\KeyShorten(
-   new Matryoshka\Ephemeral(),
-   $maxLength = 50
-);
-
-// Gets converted to: `long_key_that_need2552e62135d11e8d4233e2a51868132e`
-$cache->get("long_key_that_needs_to_be_shortened_by_just_a_little_bit");
-```
-
 ### Local
 
-Caches all values in a local array so subsequent requests for the same key can be fulfilled faster.
-It's faster version of:
+Caches all values from the specified backend in a local array so subsequent requests for the same key can be fulfilled faster.
+
+```php
+$cache = new Matryoshka\Local(new Memcache());
+```
+
+It's a faster version of:
 
 ```php
 $cache = new Matryoshka\Hierarchy([
@@ -107,21 +157,23 @@ $cache = new Matryoshka\Hierarchy([
 ]);
 ```
 
-### Memcache
+### Scope
 
-Wraps the [Memcache] client library.
+Caches values in a scope that can be deleted to invalidate all cache entries under the scope.
 
 ```php
-$memcache = new Memcache();
-$memcache->pconnect('localhost', 11211);
-$cache = Matryoshka\Memcache::create($memcache);
-
-$value = $cache->get('key');
+$cache = new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
+$cache->set('key', 'value');
+$value = $cache->get('key'); // => 'value'
+$cache->deleteScope();
+// This results in a miss because the scope has been deleted.
+$value = $cache->get('key'); // => false
 ```
 
 ### MultiScope
 
-Uses multiple scopes to store keys.
+Uses multiple scopes to store keys. Stores the scope or scopes in one backend and the scoped values in another.
+This primarily allows storing a scope in a shared but slower-to-acccess backend (for easy deletion), while storing the values in a local and faster backend for speedy access.
 
 ```php
 $scope1 = new Matryoshka\Scope($remoteMemcache, 'scope1');
@@ -136,48 +188,6 @@ $multiScope->set('key', 'value');
 $scope1->deleteScope();
 // This results in a miss because one of the scopes has been deleted.
 $value = $multiScope->get('key');
-```
-
-### Prefix
-
-Prefixes all keys with a string.
-
-```php
-$cache = new Matryoshka\Prefix(new Matryoshka\Ephemeral(), 'prefix-');
-// The key ends up being "prefix-key".
-$cache->set('key', 'value');
-$value = $cache->get('key');
-```
-
-### Scope
-
-Caches values in a scope that can be deleted to invalidate all cache entries under the scope.
-
-```php
-$cache = new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
-$cache->set('key', 'value');
-$value = $cache->get('key');
-$cache->deleteScope();
-// This results in a miss because the scope has been deleted.
-$value = $cache->get('key');
-```
-
-### Stats
-
-Records counts and timings for operations to be used for metrics.
-
-```php
-$cache = new Matryoshka\Stats(new Matryoshka\Ephemeral());
-$cache->set('key', 'value');
-$value = $cache->get('key');
-var_dump($cache->getStats());
-// array(
-//    'get_count' => 1,
-//    'get_time' => 0.007,
-//    'set_count' => 1
-//    'set_time' => 0.008,
-//    ...
-// )
 ```
 
 ## Convenience Functions
