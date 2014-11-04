@@ -7,12 +7,11 @@ use iFixit\Matryoshka;
 /**
  * Modifies all expiration times using the provided function.
  */
-class ExpirationChange extends Backend {
-   private $backend;
+class ExpirationChange extends BackendWrap {
    private $changeExpiration;
 
    public function __construct(Backend $backend, callable $changeExpiration) {
-      $this->backend = $backend;
+      parent::__construct($backend);
       $this->changeExpiration = $changeExpiration;
    }
 
@@ -39,17 +38,5 @@ class ExpirationChange extends Backend {
    public function decrement($key, $amount = 1, $expiration = 0) {
       return $this->backend->decrement($key, $amount,
        call_user_func($this->changeExpiration, $expiration));
-   }
-
-   public function get($key) {
-      return $this->backend->get($key);
-   }
-
-   public function getMultiple(array $keys) {
-      return $this->backend->getMultiple($keys);
-   }
-
-   public function delete($key) {
-      return $this->backend->delete($key);
    }
 }

@@ -4,9 +4,7 @@ namespace iFixit\Matryoshka;
 
 use iFixit\Matryoshka;
 
-abstract class KeyChange extends Backend {
-   private $backend;
-
+abstract class KeyChange extends BackendWrap {
    public abstract function changeKey($key);
 
    /**
@@ -17,10 +15,6 @@ abstract class KeyChange extends Backend {
     * @return An array of [changedKey => id].
     */
    public abstract function changeKeys(array $keys);
-
-   public function __construct(Backend $backend) {
-      $this->backend = $backend;
-   }
 
    public function set($key, $value, $expiration = 0) {
       return $this->backend->set($this->changeKey($key), $value, $expiration);

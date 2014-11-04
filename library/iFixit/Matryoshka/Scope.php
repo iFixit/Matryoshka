@@ -5,7 +5,6 @@ namespace iFixit\Matryoshka;
 use iFixit\Matryoshka;
 
 class Scope extends Prefix {
-   private $backend;
    private $scopeName;
    private $scopePrefix;
 
