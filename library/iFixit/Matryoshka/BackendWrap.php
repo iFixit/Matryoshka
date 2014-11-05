@@ -5,10 +5,10 @@ namespace iFixit\Matryoshka;
 use iFixit\Matryoshka;
 
 /**
- * A convenience class for making wrapping backends who's functions fall 
+ * A convenience class for making wrapping backends who's functions fall
  * through to the underlying backend when they aren't implemented.
  *
- * Makes it easier to implement one or two of the functions without having to 
+ * Makes it easier to implement one or two of the functions without having to
  * do all of them.
  */
 abstract class BackendWrap extends Backend {
