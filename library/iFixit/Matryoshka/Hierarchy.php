@@ -89,6 +89,10 @@ class Hierarchy extends Backend {
    }
 
    public function getMultiple(array $keys) {
+      if (empty($keys)) {
+         return [[],[]];
+      }
+
       $missed = $keys;
       $found = [];
 

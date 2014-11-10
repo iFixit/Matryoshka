@@ -125,6 +125,10 @@ abstract class Backend {
     */
    public function getAndSetMultiple(array $keys, callable $callback,
     $expiration = 0) {
+      if (empty($keys)) {
+         return $keys; // memory-neutral form of []
+      }
+
       list($found, $missing) = $this->getMultiple($keys);
 
       if (empty($missing)) {

@@ -77,6 +77,10 @@ class Memcache extends Backend {
    }
 
    public function getMultiple(array $keys) {
+      if (empty($keys)) {
+         return [[],[]];
+      }
+
       // Default to an empty array in case no keys were found.
       $hits = $this->memcache->get(array_keys($keys)) ?: [];
 

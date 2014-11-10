@@ -43,6 +43,10 @@ abstract class KeyChange extends BackendWrap {
    }
 
    public function getMultiple(array $keys) {
+      if (empty($keys)) {
+         return [[],[]];
+      }
+
       // Ignore the missed values -- we will recompute them later.
       list($found) = $this->backend->getMultiple($this->changeKeys($keys));
 

@@ -87,6 +87,10 @@ class Local extends Backend {
       $localFound = array_intersect_key($this->cache, $keys);
       $localMissing = array_diff_key($keys, $localFound);
 
+      if (empty($localMissing)) {
+         return [array_merge($keys, $localFound), []];
+      }
+
       list($backendFound, $backendMissing) =
        $this->backend->getMultiple($localMissing);
 

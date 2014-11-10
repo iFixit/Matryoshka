@@ -61,4 +61,19 @@ class LocalTest extends AbstractBackendTest {
       $this->assertSame($cache->getCache(),
          [$key1 => $value1, $key2 => $value2]);
    }
+
+   public function testLocalGetMultipleOptimizeOnEmpty() {
+      $ephemeral = new Matryoshka\Ephemeral();
+      $stats = new Matryoshka\Stats($ephemeral);
+      $cache = new TestLocal($stats);
+
+      list($key, $value) = $this->getRandomKeyValue();
+      $ephemeral->set($key, $value);
+
+      list($found, $missing) = $cache->getMultiple([$key => 'key']);
+      $getMultiCount = $stats->getStats()['getMultiple_count'];
+      list($found, $missing) = $cache->getMultiple([$key => 'key']);
+      // Assert that "Local" cache hits don't end up querying the underlying backend at all
+      $this->assertSame($getMultiCount, $stats->getStats()['getMultiple_count']);
+   }
 }
