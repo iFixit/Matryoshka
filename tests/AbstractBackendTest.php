@@ -107,7 +107,8 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       }
 
       $realValue = $backend->get($key1);
-      if (get_called_class() === 'MemcacheTest') {
+      if (get_called_class() === 'MemcacheTest'
+       || get_called_class() === 'MemcachedTest') {
          // HHVM's memcache get returns a string rather than an integer.
          $realValue = (int)$realValue;
       }
@@ -119,7 +120,8 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       // TODO: Memcache has some strange behavior with these values that
       // doesn't appear to match the docs. It might have to do with
       // compression.
-      if (get_called_class() !== 'MemcacheTest') {
+      if (get_called_class() !== 'MemcacheTest'
+       && get_called_class() !== 'MemcachedTest') {
          $invalidValues = [
             'string',
             ['array'],
@@ -142,7 +144,8 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
 
       // TODO: Memcache values cannot be decremented below 0 so we must
       // start it out higher.
-      if (get_called_class() === 'MemcacheTest') {
+      if (get_called_class() === 'MemcacheTest'
+       || get_called_class() === 'MemcachedTest') {
          $currentValue = 400;
          $backend->set($key1, $currentValue);
       } else {
@@ -155,7 +158,8 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       }
 
       $realValue = $backend->get($key1);
-      if (get_called_class() === 'MemcacheTest') {
+      if (get_called_class() === 'MemcacheTest'
+       || get_called_class() === 'MemcachedTest') {
          // HHVM's memcache get returns a string rather than an integer.
          $realValue = (int)$realValue;
       }
@@ -165,7 +169,8 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
 
       // TODO: Memcache has some strange behavior with these values that
       // doesn't appear to match the docs.
-      if (get_called_class() !== 'MemcacheTest') {
+      if (get_called_class() !== 'MemcacheTest'
+       && get_called_class() !== 'MemcachedTest') {
          $this->assertSame(-7, $backend->decrement($key1, 7));
 
          $invalidValues = [
@@ -374,7 +379,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $validChars = [
          '`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',
          '+', '=', '|', '\\', '[', '{', ']', '}', '<', ',', '>', '.', '?', '/',
-         '☃', ' ', "\n", "\r"
+         '☃', "\n", "\r"
       ];
 
       foreach ($validChars as $char) {
