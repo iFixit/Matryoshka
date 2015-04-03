@@ -26,8 +26,8 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($value1, $backend->get($key1));
       $this->assertTrue($backend->set($key1, $value1));
       $this->assertTrue($backend->delete($key1));
-      $this->assertFalse($backend->delete($key1));
       $this->assertNull($backend->get($key1));
+      $this->assertFalse($backend->delete($key1));
 
       $this->assertTrue($backend->set($key2, $value2));
       $this->assertTrue($backend->set($key3, $value3));
