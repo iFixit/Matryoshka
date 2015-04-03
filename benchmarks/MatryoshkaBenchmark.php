@@ -228,6 +228,7 @@ class MatryoshkaBenchmark {
       $memcached = new Memcached();
       $memcached->addServer('localhost', 11211);
       $memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true);
+      $memcached->setOption(Memcached::OPT_TCP_NODELAY, true);
       return $memcached;
    }
 
