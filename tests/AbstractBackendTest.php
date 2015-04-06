@@ -199,8 +199,6 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertTrue($backend->set($key, $initialValue));
 
       $this->assertSame($initialValue - 1, $backend->increment($key, -1));
-      $this->assertEquals($initialValue - 1, $backend->get($key));
-
       $this->assertSame($initialValue, $backend->decrement($key, -1));
       $this->assertEquals($initialValue, $backend->get($key));
    }
