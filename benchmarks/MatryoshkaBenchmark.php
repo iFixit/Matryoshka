@@ -134,7 +134,7 @@ class MatryoshkaBenchmark {
       $benchmarkRegex = $options['benchmark'];
       $backendRegex = $options['backend'];
 
-      $allResults = [];
+      $results = [];
       $benchmarkMethods = self::getBenchmarkMethods($benchmarkRegex);
 
       foreach ($benchmarkMethods as $method) {
