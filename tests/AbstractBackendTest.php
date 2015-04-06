@@ -115,6 +115,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($currentValue, $realValue);
 
       $this->assertTrue($backend->delete($key1));
+      $this->assertNull($backend->get($key1));
       $this->assertSame(7, $backend->increment($key1, 7));
 
       // TODO: Memcache has some strange behavior with these values that
