@@ -95,6 +95,13 @@ abstract class Backend {
    public abstract function delete($key);
 
    /**
+    * Deletes multiple keys.
+    *
+    * @return true on success, false on failure
+    */
+   public abstract function deleteMultiple(array $keys);
+
+   /**
     * Wrapper around get and set that uses the provided callback to retrieve
     * and populate the cache if the key is not found in the cache. If
     * $callback returns Backend::NULL, the corresponding set() call won't

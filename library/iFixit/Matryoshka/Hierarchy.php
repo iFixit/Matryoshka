@@ -138,4 +138,13 @@ class Hierarchy extends Backend {
 
       return $success;
    }
+
+   public function deleteMultiple(array $keys) {
+      $success = true;
+      foreach ($this->backends as $backend) {
+         $success = $backend->deleteMultiple($keys) && $success;
+      }
+
+      return $success;
+   }
 }

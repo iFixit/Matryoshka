@@ -111,4 +111,14 @@ class Memcache extends Backend {
    public function delete($key) {
       return $this->memcache->delete($key);
    }
+
+   public function deleteMultiple(array $keys) {
+      $success = true;
+
+      foreach ($keys as $key) {
+         $success = $this->memcache->delete($key) && $success;
+      }
+
+      return $success;
+   }
 }

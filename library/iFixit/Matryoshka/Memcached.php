@@ -92,4 +92,16 @@ class Memcached extends Backend {
    public function delete($key) {
       return $this->memcached->delete($key);
    }
+
+   public function deleteMultiple(array $keys) {
+      $results = $this->memcached->deleteMulti($keys);
+
+      foreach ($results as $key => $success) {
+         if ($success !== true) {
+            return false;
+         }
+      }
+
+      return true;
+   }
 }

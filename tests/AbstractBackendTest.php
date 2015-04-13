@@ -75,6 +75,30 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertEmpty($missed);
    }
 
+   public function testdeleteMultiple() {
+      $backend = $this->getBackend();
+
+      list($key1, $value1) = $this->getRandomKeyValue();
+      list($key2, $value2) = $this->getRandomKeyValue();
+      list($key3, $value3) = $this->getRandomKeyValue();
+      list($key4, $value4) = $this->getRandomKeyValue();
+
+      $this->assertTrue($backend->set($key1, $value1));
+      $this->assertTrue($backend->set($key2, $value2));
+      $this->assertTrue($backend->set($key3, $value3));
+      $this->assertTrue($backend->set($key4, $value4));
+
+      $this->assertTrue($backend->deleteMultiple([$key1, $key2]));
+      $this->assertNull($backend->get($key1));
+      $this->assertNull($backend->get($key2));
+      $this->assertFalse($backend->deleteMultiple([$key1, $key3]));
+      $this->assertFalse($backend->deleteMultiple([$key1, $key2, $key3, $key4]));
+      $this->assertNull($backend->get($key1));
+      $this->assertNull($backend->get($key2));
+      $this->assertNull($backend->get($key3));
+      $this->assertNull($backend->get($key4));
+   }
+
    public function testadd() {
       $backend = $this->getBackend();
       list($key1, $value1) = $this->getRandomKeyValue();

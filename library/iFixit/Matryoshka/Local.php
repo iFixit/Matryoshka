@@ -118,6 +118,16 @@ class Local extends Backend {
       return $success;
    }
 
+   public function deleteMultiple(array $keys) {
+      $success = $this->backend->deleteMultiple($keys);
+
+      foreach ($keys as $key) {
+         unset($this->cache[$key]);
+      }
+
+      return $success;
+   }
+
    public function setMultiple(array $values, $expiration = 0) {
       $success = $this->backend->setMultiple($values, $expiration);
 

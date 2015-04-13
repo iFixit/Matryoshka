@@ -30,12 +30,15 @@ class StatsTest extends AbstractBackendTest {
       $backend->get($key);
       $backend->getMultiple([$key => '', $key2 => '']);
       $backend->delete($key);
+      $backend->deleteMultiple([$key, $key2]);
 
       $end = microtime(true);
       $maxTime = $end - $start;
 
       foreach ($backend->getStats() as $stat => $value) {
-         if ($stat == 'getMultiple_key_count' || $stat == 'setMultiple_key_count') {
+         if ($stat == 'getMultiple_key_count' ||
+             $stat == 'setMultiple_key_count' ||
+             $stat == 'deleteMultiple_key_count') {
             $this->assertSame(2, $value, $stat);
          } else if (strpos($stat, '_count') !== false) {
             $this->assertSame(1, $value, $stat);

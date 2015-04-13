@@ -89,4 +89,18 @@ class Ephemeral extends Backend {
          return false;
       }
    }
+
+   public function deleteMultiple(array $keys) {
+      $success = true;
+
+      foreach ($keys as $key) {
+         if (array_key_exists($key, $this->cache)) {
+            unset($this->cache[$key]);
+         } else {
+            $success = false;
+         }
+      }
+
+      return $success;
+   }
 }

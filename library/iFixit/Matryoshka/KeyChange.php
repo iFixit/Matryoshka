@@ -70,4 +70,11 @@ abstract class KeyChange extends BackendWrap {
    public function delete($key) {
       return $this->backend->delete($this->changeKey($key));
    }
+
+   public function deleteMultiple(array $keys) {
+      // changeKeys works on [key => id, ...] rather than [key, ...] so we
+      // have to flip it and flip it back.
+      $changedKeys = array_flip($this->changeKeys(array_flip($keys)));
+      return $this->backend->deleteMultiple($changedKeys);
+   }
 }
