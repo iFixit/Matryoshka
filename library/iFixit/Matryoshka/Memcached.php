@@ -94,6 +94,17 @@ class Memcached extends Backend {
    }
 
    public function deleteMultiple(array $keys) {
+      // Some environments (HHVM) don't implement deleteMulti so we need to
+      // roll it ourselves.
+      if (!method_exists($this->memcached, 'deleteMulti')) {
+         $success = true;
+         foreach ($keys as $key) {
+            $success = $this->memcached->delete($key) && $success;
+         }
+
+         return $success;
+      }
+
       $results = $this->memcached->deleteMulti($keys);
 
       foreach ($results as $key => $success) {
