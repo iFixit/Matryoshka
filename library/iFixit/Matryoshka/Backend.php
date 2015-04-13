@@ -26,6 +26,15 @@ abstract class Backend {
    public abstract function set($key, $value, $expiration = 0);
 
    /**
+    * Sets multiple key/value pairs with the given expiration.
+    *
+    * @param $values Array of [key => value] to set.
+    *
+    * @return True if all values set successfully, false otherwise.
+    */
+   public abstract function setMultiple(array $values, $expiration = 0);
+
+   /**
     * Same as set except it does nothing if the key already exists.
     *
     * @return true on success, false if the key exists or the operation fails
@@ -156,22 +165,5 @@ abstract class Backend {
       }
 
       return $found;
-   }
-
-   /**
-    * Sets multiple key/value pairs with the given expiration.
-    *
-    * @param $values Array of [key => value] to set.
-    *
-    * @return True if all values set successfully, false otherwise.
-    */
-   public function setMultiple(array $values, $expiration = 0) {
-      $success = true;
-
-      foreach ($values as $key => $value) {
-         $success = $this->set($key, $value, $expiration) && $success;
-      }
-
-      return $success;
    }
 }

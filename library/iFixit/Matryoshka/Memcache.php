@@ -31,6 +31,16 @@ class Memcache extends Backend {
       return $this->memcache->set($key, $value, self::FLAGS, $expiration);
    }
 
+   public function setMultiple(array $values, $expiration = 0) {
+      $success = true;
+
+      foreach ($values as $key => $value) {
+         $success = $this->set($key, $value, $expiration) && $success;
+      }
+
+      return $success;
+   }
+
    public function add($key, $value, $expiration = 0) {
       return $this->memcache->add($key, $value, self::FLAGS, $expiration);
    }
