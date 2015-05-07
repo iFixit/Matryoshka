@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../library/iFixit/Matryoshka.php';
 
 use iFixit\Matryoshka;
@@ -132,7 +134,7 @@ class MatryoshkaBenchmark {
       $benchmarkRegex = $options['benchmark'];
       $backendRegex = $options['backend'];
 
-      $allResults = [];
+      $results = [];
       $benchmarkMethods = self::getBenchmarkMethods($benchmarkRegex);
 
       foreach ($benchmarkMethods as $method) {
@@ -222,6 +224,14 @@ class MatryoshkaBenchmark {
       return $memcache;
    }
 
+   private static function getMemcached() {
+      $memcached = new Memcached();
+      $memcached->addServer('localhost', 11211);
+      $memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true);
+      $memcached->setOption(Memcached::OPT_TCP_NODELAY, true);
+      return $memcached;
+   }
+
    private static function getDisabled(Matryoshka\Backend $backend) {
       $disabled = new Matryoshka\Enable($backend);
       $disabled->getsEnabled = false;
@@ -276,6 +286,12 @@ class MatryoshkaBenchmark {
          );
          $allBackends['Memcache'] = Matryoshka\Memcache::create(
             self::getMemcache()
+         );
+      }
+
+      if (Matryoshka\Memcached::isAvailable()) {
+         $allBackends['Memcached'] = Matryoshka\Memcached::create(
+            self::getMemcached()
          );
       }
 
