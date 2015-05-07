@@ -33,7 +33,10 @@ class Stats extends Backend {
          'getMultiple_hit_count' => 0,
          'getMultiple_time' => 0,
          'delete_count' => 0,
-         'delete_time' => 0
+         'delete_time' => 0,
+         'deleteMultiple_count' => 0,
+         'deleteMultiple_key_count' => 0,
+         'deleteMultiple_time' => 0,
       ];
    }
 
@@ -136,5 +139,17 @@ class Stats extends Backend {
       $this->stats['delete_time'] += $end - $start;
 
       return $value;
+   }
+
+   public function deleteMultiple(array $keys) {
+      $start = microtime(true);
+      $success = $this->backend->deleteMultiple($keys);
+      $end = microtime(true);
+
+      $this->stats['deleteMultiple_count']++;
+      $this->stats['deleteMultiple_key_count'] += count($keys);
+      $this->stats['deleteMultiple_time'] += $end - $start;
+
+      return $success;
    }
 }

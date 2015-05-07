@@ -88,4 +88,12 @@ class Enable extends Backend {
          return false;
       }
    }
+
+   public function deleteMultiple(array $keys) {
+      if ($this->deletesEnabled) {
+         return $this->backend->deleteMultiple($keys);
+      } else {
+         return false;
+      }
+   }
 }
