@@ -379,6 +379,69 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       }
    }
 
+   public function testgetAndSetMultipleCallback() {
+      $backend = $this->getBackend();
+      $numMisses = 0;
+      $makeClosure = function($value) use (&$numMisses) {
+         return function() use ($value, &$numMisses) {
+            $numMisses++;
+            return $value;
+         };
+      };
+
+      $keys = [];
+      $expected = [];
+      $numKeys = 10;
+      for ($i = 0; $i < $numKeys; $i++) {
+         list($key, $value) = $this->getRandomKeyValue();
+         $keys[$key] = $makeClosure($value);
+         $expected[$key] = $value;
+      }
+
+      $numMisses = 0;
+      $this->assertSame($backend->getAndSetMultipleCallback($keys), $expected);
+      $this->assertSame($numKeys, $numMisses);
+
+      $numMisses = 0;
+      $this->assertSame($backend->getAndSetMultipleCallback($keys), $expected);
+      $this->assertSame(0, $numMisses);
+   }
+
+   public function testgetAndSetMultipleCallbackMissing() {
+      $backend = $this->getBackend();
+      $numMisses = 0;
+      $makeClosure = function($value) use (&$numMisses) {
+         return function() use ($value, &$numMisses) {
+            $numMisses++;
+            return $value;
+         };
+      };
+
+      $keys = [];
+      $expected = [];
+      $numKeys = 10;
+      for ($i = 0; $i < $numKeys; $i++) {
+         list($key, $value) = $this->getRandomKeyValue();
+         $keys[$key] = $makeClosure($value);
+         $expected[$key] = $value;
+      }
+
+      // Add another one with a callback that returns null.
+      $numKeys++;
+      list($key, $value) = $this->getRandomKeyValue();
+      $keys[$key] = $makeClosure(null);
+      $expected[$key] = null;
+
+      $numMisses = 0;
+      $this->assertSame($backend->getAndSetMultipleCallback($keys), $expected);
+      $this->assertSame($numKeys, $numMisses);
+
+      $numMisses = 0;
+      $this->assertSame($backend->getAndSetMultipleCallback($keys), $expected);
+      // The null callback is always a miss.
+      $this->assertSame(1, $numMisses);
+   }
+
    public function testlongKeys() {
       $backend = $this->getBackend();
       list($key, $value) = $this->getRandomKeyValue();
