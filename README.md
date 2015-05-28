@@ -1,6 +1,7 @@
 # Matryoshka
 
 [![Build Status](https://travis-ci.org/iFixit/Matryoshka.png?branch=master)](https://travis-ci.org/iFixit/Matryoshka)
+[![HHVM Status](http://hhvm.h4cc.de/badge/ifixit/matryoshka.svg)](http://hhvm.h4cc.de/package/ifixit/matryoshka)
 
 Matryoshka is a caching library for PHP built around nesting components like [Russian nesting dolls].
 
