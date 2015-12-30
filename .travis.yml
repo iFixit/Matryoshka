@@ -7,6 +7,7 @@ php:
 services: memcached
 before_script:
   - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then phpenv config-add .travisphpconfig.ini ; fi;'
+  - pecl install -f apcu-4.0.10
 script:
   - phpunit tests
   - php benchmarks/MatryoshkaBenchmark.php
