@@ -56,6 +56,9 @@ class APCu extends Backend {
       $missed = [];
       foreach ($keys as $key => $id) {
          $value = array_key_exists($key, $hits) ? $hits[$key] : self::MISS;
+         // Abstract class function docs say $found[] should contain all keys
+         // with null values for the misses, so we store the result even
+         // when it's a miss.
          $found[$key] = $value;
 
          if ($value === self::MISS) {
@@ -71,7 +74,8 @@ class APCu extends Backend {
    }
 
    public function deleteMultiple(array $keys) {
-      // apcu_delete returns an array of errors if you provide an array of keys
+      // The docs leave out the fact that apcu_delete() can take an array of keys,
+      // when you provide an array of keys, it provides an array of errors (if any)
       // so the only successful case is no errors (empty array).
       $ret = apcu_delete($keys);
       return empty($ret);
