@@ -35,6 +35,17 @@ $cache = Matryoshka\Memcache::create($memcache);
 $value = $cache->get('key');
 ```
 
+### APCu
+
+Caches values in a shared memory segment (available to all processes under
+a webserver) using the [APCu php extension].
+
+```php
+$cache = new Matryoshka\APCu();
+$cache->set('key', 'value');
+$value = $cache->get('key');
+```
+
 ### Ephemeral
 
 Caches values in a local memory array that lasts the duration of the PHP process.
@@ -260,3 +271,5 @@ $values = $cache->getAndSetMultiple($keys, function($missing) {
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
+
+[APCu php extension]: http://php.net/manual/en/book.apcu.php

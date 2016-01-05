@@ -295,6 +295,10 @@ class MatryoshkaBenchmark {
          );
       }
 
+      if (Matryoshka\APCu::isAvailable()) {
+         $allBackends['APCu'] = new Matryoshka\APCu();
+      }
+
       if ($regex !== null) {
          foreach ($allBackends as $type => $backend) {
             if (!preg_match("/$regex/i", $type)) {
