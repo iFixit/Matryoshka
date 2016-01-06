@@ -26,4 +26,12 @@ class MemcacheTest extends AbstractBackendTest {
 
       $this->assertNull($backend->get($key));
    }
+
+   /**
+    * Memcache turns whitespace in keys into underscores, so we have to
+    * exempt both chars from key equivalence tests.
+    */
+   protected function isCharExemptFromKeyEquivalence($char) {
+      return $char === '_' || preg_match("/\s/", $char);
+   }
 }

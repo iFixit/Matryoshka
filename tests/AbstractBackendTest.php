@@ -405,13 +405,36 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
          '☃', "\n", "\r"
       ];
 
+      list($baseKey, $value) = $this->getRandomKeyValue();
+      $equivalentKeyChars = [];
       foreach ($validChars as $char) {
-         list($key, $value) = $this->getRandomKeyValue();
-         $key .= $char;
+         $key = $baseKey . $char;
+         $value = $char;
+
+         // If this key had been set before, it means one of the previous
+         // chars are considered equivalent, and that's bad.
+         $prevVal = $backend->get($key);
+         if ($prevVal !== null) {
+            if (!array_key_exists($prevVal, $equivalentKeyChars)) {
+               $equivalentKeyChars[$prevVal][] = $prevVal;
+            }
+            $equivalentKeyChars[$prevVal][] = $char;
+            $value = $prevVal;
+         }
 
          $this->assertTrue($backend->set($key, $value));
          $this->assertSame($value, $backend->get($key));
       }
+
+      $allEquivalentChars = [];
+      array_walk_recursive($equivalentKeyChars,
+       function($char) use (&$allEquivalentChars) {
+         if (!$this->isCharExemptFromKeyEquivalence($char)) {
+            $allEquivalentChars[] = $char;
+         }
+      });
+      $this->assertSame([], $allEquivalentChars,
+       "Some keys are considered equivalent when they shouldn't be");
    }
 
    public function testisAvailable() {
@@ -449,6 +472,14 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $memcache->pconnect('localhost', 11211);
 
       return $memcache;
+   }
+
+   /**
+    * Allow some implementations to exempt some chars from key equivalence
+    * checking.
+    */
+   protected function isCharExemptFromKeyEquivalence($char) {
+      return false;
    }
 }
 
