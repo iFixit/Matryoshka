@@ -35,6 +35,29 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($value3, $backend->get($key3));
    }
 
+   public function testgetSetBasicTypes() {
+      $backend = $this->getBackend();
+      $assertWorks = function($value) use ($backend) {
+         list($key) = $this->getRandomKeyValue();
+         $this->assertNull($backend->get($key));
+         $this->assertTrue($backend->set($key, $value));
+         $this->assertSame($value, $backend->get($key));
+         $this->assertTrue($backend->set($key, $value));
+         $this->assertTrue($backend->delete($key));
+         $this->assertNull($backend->get($key));
+         $this->assertFalse($backend->delete($key));
+      };
+
+      $assertWorks('a');
+      $assertWorks('1');
+      $assertWorks(1);
+      $assertWorks(0);
+      $assertWorks(true);
+      $assertWorks(PHP_INT_MAX);
+      $assertWorks([1]);
+      $assertWorks([0]);
+   }
+
    public function testgetMultiple() {
       $backend = $this->getBackend();
       list($key1, $value1, $id1) = $this->getRandomKeyValueId();
