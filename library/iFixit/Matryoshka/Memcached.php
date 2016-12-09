@@ -6,6 +6,10 @@ use iFixit\Matryoshka;
 
 class Memcached extends Backend {
    const MAX_KEY_LENGTH = 250;
+
+   // Is using instance of Memcache whose `getMulti` only accepts two args.
+   protected static $isPHP7 = null;
+
    private $memcached;
 
    public static function isAvailable() {
@@ -18,6 +22,22 @@ class Memcached extends Backend {
     * truncated.
     */
    public static function create(\Memcached $memcached) {
+      $backend = new KeyShorten(new self($memcached), self::MAX_KEY_LENGTH);
+
+      // The PHP 7 version of Memcached has a different API. We can tell which
+      // API to use by how many arguments the method takes.
+      if (self::$isPHP7 === null) {
+         $getMulti = new \ReflectionMethod($memcached, 'getMulti');
+         $numArgs = $getMulti->getNumberOfParameters();
+
+         if ($numArgs === 2) {
+            self::$isPHP7 = true;
+         } else {
+            self::$isPHP7 = false;
+         }
+      }
+
+
       return new KeyShorten(new self($memcached), self::MAX_KEY_LENGTH);
    }
 
@@ -75,9 +95,16 @@ class Memcached extends Backend {
        * the order that they were requested with null indicating a miss which
        * is exactly what is needed for the found array.
        */
-      $cas_tokens = null;
-      $found = $this->memcached->getMulti(array_keys($keys), $cas_tokens,
-       \Memcached::GET_PRESERVE_ORDER);
+      if (self::$isPHP7 === true) {
+         // The PHP7 version of Memcached (at the time of this writing) does not
+         // accept a `cas_token` param.
+         $found = $this->memcached->getMulti(array_keys($keys),
+          \Memcached::GET_PRESERVE_ORDER);
+      } else {
+         $cas_tokens = null;
+         $found = $this->memcached->getMulti(array_keys($keys), $cas_tokens,
+          \Memcached::GET_PRESERVE_ORDER);
+      }
 
       $missed = [];
       foreach ($keys as $key => $id) {
