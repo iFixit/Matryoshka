@@ -22,8 +22,6 @@ class Memcached extends Backend {
     * truncated.
     */
    public static function create(\Memcached $memcached) {
-      $backend = new KeyShorten(new self($memcached), self::MAX_KEY_LENGTH);
-
       // The PHP 7 version of Memcached has a different API. We can tell which
       // API to use by how many arguments the method takes.
       if (self::$getMultiHasTwoParams === null) {
@@ -36,7 +34,6 @@ class Memcached extends Backend {
             self::$getMultiHasTwoParams = false;
          }
       }
-
 
       return new KeyShorten(new self($memcached), self::MAX_KEY_LENGTH);
    }
