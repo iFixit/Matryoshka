@@ -8,7 +8,7 @@ class Memcached extends Backend {
    const MAX_KEY_LENGTH = 250;
 
    // Is using instance of Memcache whose `getMulti` only accepts two args.
-   protected static $isPHP7 = null;
+   protected static $getMultiHasTwoParams = null;
 
    private $memcached;
 
@@ -26,14 +26,14 @@ class Memcached extends Backend {
 
       // The PHP 7 version of Memcached has a different API. We can tell which
       // API to use by how many arguments the method takes.
-      if (self::$isPHP7 === null) {
+      if (self::$getMultiHasTwoParams === null) {
          $getMulti = new \ReflectionMethod($memcached, 'getMulti');
          $numArgs = $getMulti->getNumberOfParameters();
 
          if ($numArgs === 2) {
-            self::$isPHP7 = true;
+            self::$getMultiHasTwoParams = true;
          } else {
-            self::$isPHP7 = false;
+            self::$getMultiHasTwoParams = false;
          }
       }
 
@@ -95,7 +95,7 @@ class Memcached extends Backend {
        * the order that they were requested with null indicating a miss which
        * is exactly what is needed for the found array.
        */
-      if (self::$isPHP7 === true) {
+      if (self::$getMultiHasTwoParams === true) {
          // The PHP7 version of Memcached (at the time of this writing) does not
          // accept a `cas_token` param.
          $found = $this->memcached->getMulti(array_keys($keys),
