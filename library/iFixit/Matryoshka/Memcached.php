@@ -28,11 +28,7 @@ class Memcached extends Backend {
          $getMulti = new \ReflectionMethod($memcached, 'getMulti');
          $numArgs = $getMulti->getNumberOfParameters();
 
-         if ($numArgs === 2) {
-            self::$getMultiHasTwoParams = true;
-         } else {
-            self::$getMultiHasTwoParams = false;
-         }
+         self::$getMultiHasTwoParams = $numArgs === 2;
       }
 
       return new KeyShorten(new self($memcached), self::MAX_KEY_LENGTH);
