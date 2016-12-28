@@ -402,7 +402,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $validChars = [
          '`', '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',
          '+', '=', '|', '\\', '[', '{', ']', '}', '<', ',', '>', '.', '?', '/',
-         '☃', "\n", "\r"
+         '☃', "\n", "\r", ' ',
       ];
 
       list($baseKey, $value) = $this->getRandomKeyValue();
