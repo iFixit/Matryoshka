@@ -81,11 +81,32 @@ $cache = new Matryoshka\ExpirationChange($backend, $changeFunc);
 $cache->set('key', 'value', 10); // Results in an expiration time of 20.
 ```
 
+### KeyFix
+
+Fixes troublesome keys by shortening longer ones to less than or equal the specified length, and getting rid of any specified, invalid characters.
+It accomplishes this by using `md5` to hash offending keys into an alphanumeric string of uniform length.
+
+```php
+$cache = new Matryoshka\KeyFix(
+   new Matryoshka\Ephemeral(),
+   $maxLength = 50,
+   $invalidChars = " \n"
+);
+
+// Gets converted to: `2552e62135d11e8d4233e2a51868132e`
+$cache->get("long_key_that_needs_to_be_shortened_by_just_a_little_bit");
+
+// Gets converted to: `6c4421388643338490f9c2c895af4fec`
+$cache->get("key with bad chars like spaces");
+```
+
 ### KeyShorten
 
 Ensures that all keys are at most the specified length by shortening longer ones.
 Long keys are shortend by using `md5` on the end of the string
 to ensure long strings with a common prefix don't map to the same key.
+
+Either this _or_ KeyFix should be used, not both. KeyFix handles long keys _and_ bad characters, making this an unnecessary addition.
 
 ```php
 $cache = new Matryoshka\KeyShorten(
