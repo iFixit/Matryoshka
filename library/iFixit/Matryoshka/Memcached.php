@@ -31,7 +31,7 @@ class Memcached extends Backend {
          self::$getMultiHasTwoParams = $numArgs === 2;
       }
 
-      return new KeyShorten(new self($memcached), self::MAX_KEY_LENGTH);
+      return new KeyFix(new self($memcached), self::MAX_KEY_LENGTH);
    }
 
    private function __construct(\Memcached $memcached) {
