@@ -136,6 +136,7 @@ abstract class Backend {
     *           @return Array of [key => value] for the found values. The
     *                   order does not matter. Additional key/values in the
     *                   array that are not in the missing array are ignored.
+    *
     * @return Array of [key => value] in the same order as the requested keys.
     *         This does not include values not returned by the callback.
     */
@@ -170,6 +171,44 @@ abstract class Backend {
             unset($found[$key]);
          }
       }
+
+      return $found;
+   }
+
+   /**
+    * Wrapper around getMultiple that uses a callback per key to retrieve and
+    * populate the cache for any misses.
+    *
+    * @param $keys An array of [key => callback] where the callback will be
+    *              called to generate the value if the corresponding key isn't
+    *              found in the cache.
+    *
+    * @return Array of [key => value] in the same order as the requested keys.
+    */
+   public function getAndSetMultipleCallback(array $keys, $expiration = 0) {
+      if (empty($keys)) {
+         return [];
+      }
+
+      list($found, $missing) = $this->getMultiple($keys);
+
+      if (empty($missing)) {
+         return $found;
+      }
+
+      foreach ($missing as $key => $callback) {
+         $value = $callback();
+
+         if ($value !== null) {
+            $missing[$key] = $value;
+            $found[$key] = $value;
+         } else {
+            // Remove the key so we don't cache the closure.
+            unset($missing[$key]);
+         }
+      }
+
+      $this->setMultiple($missing, $expiration);
 
       return $found;
    }
