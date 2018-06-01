@@ -14,7 +14,7 @@ class DeleteBeforeUpdate extends BackendWrap {
    public function set($key, $value, $expiration = 0) {
       if ($this->backend->add($key, $value) === false) {
          $this->backend->delete($key);
-         $this->backend->add($key, $valaue);
+         $this->backend->set($key, $valaue);
       }
    }
 
