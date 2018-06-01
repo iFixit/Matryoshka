@@ -12,9 +12,9 @@ use iFixit\Matryoshka;
  */
 class DeleteBeforeUpdate extends BackendWrap {
    public function set($key, $value, $expiration = 0) {
-      if ($this->backend->add($key, $value) === false) {
+      if ($this->backend->add($key, $value, $expiration) === false) {
          $this->backend->delete($key);
-         $this->backend->set($key, $value);
+         $this->backend->set($key, $value, $expiration);
       }
    }
 
