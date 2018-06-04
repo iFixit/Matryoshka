@@ -9,7 +9,7 @@ use iFixit\Matryoshka;
 
 Matryoshka::autoload();
 
-abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
+abstract class AbstractBackendTest extends \PHPUnit\Framework\TestCase {
    protected abstract function getBackend();
 
    /**
