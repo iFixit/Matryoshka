@@ -12,15 +12,18 @@ use iFixit\Matryoshka;
  */
 class DeleteBeforeUpdate extends BackendWrap {
    public function set($key, $value, $expiration = 0) {
-      if ($this->backend->add($key, $value, $expiration) === false) {
+      $addResponse = $this->backend->add($key, $value, $expiration);
+      if ($addResponse === false) {
          $this->backend->delete($key);
-         $this->backend->set($key, $value, $expiration);
+         return $this->backend->set($key, $value, $expiration);
       }
+      return $addResponse;
    }
 
    public function setMultiple(array $values, $expiration = 0) {
       foreach ($values as $key => $value) {
          $this->set($key, $value, $expiration);
       }
+      return true;
    }
 }
