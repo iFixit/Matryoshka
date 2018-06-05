@@ -6,6 +6,9 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../library/iFixit/Matryoshka.php';
 
 use iFixit\Matryoshka;
+if (!class_exists("PHPUnit_Framework_TestCase", false)) {
+   abstract class PHPUnit_Framework_TestCase extends \PHPUnit\Framework\TestCase {}
+}
 
 Matryoshka::autoload();
 
