@@ -10,7 +10,7 @@ class Memcached extends Backend {
    // Is using instance of Memcache whose `getMulti` only accepts two args.
    protected static $getMultiHasTwoParams = null;
 
-   private $memcached;
+   protected $memcached;
 
    public static function isAvailable() {
       return class_exists('\Memcached', false);
@@ -31,7 +31,7 @@ class Memcached extends Backend {
          self::$getMultiHasTwoParams = $numArgs === 2;
       }
 
-      return new KeyFix(new self($memcached), self::MAX_KEY_LENGTH);
+      return new KeyFix(new static($memcached), self::MAX_KEY_LENGTH);
    }
 
    private function __construct(\Memcached $memcached) {
