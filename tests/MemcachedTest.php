@@ -22,7 +22,7 @@ class MemcachedTest extends AbstractBackendTest {
       return Matryoshka\Memcached::create($memcached);
    }
 
-   public function testMemcached() {
+   public function testExpiration() {
       $backend = $this->getBackend();
       list($key, $value) = $this->getRandomKeyValue();
       $this->assertTrue($backend->set($key, $value, 1));
