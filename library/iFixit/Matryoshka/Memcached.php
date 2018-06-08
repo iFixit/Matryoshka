@@ -22,14 +22,7 @@ class Memcached extends Backend {
     * truncated.
     */
    public static function create(\Memcached $memcached) {
-      // The PHP 7 version of Memcached has a different API. We can tell which
-      // API to use by how many arguments the method takes.
-      if (self::$getMultiHasTwoParams === null) {
-         $getMulti = new \ReflectionMethod($memcached, 'getMulti');
-         $numArgs = $getMulti->getNumberOfParameters();
-
-         self::$getMultiHasTwoParams = $numArgs === 2;
-      }
+      self::setGetMultiParams($memcached);
 
       return new KeyFix(new static($memcached), self::MAX_KEY_LENGTH);
    }
@@ -134,5 +127,18 @@ class Memcached extends Backend {
       }
 
       return true;
+   }
+
+   /**
+    * The PHP 7 version of Memcached has a different API. We can tell which
+    * API to use by how many arguments the method takes.
+    */
+   protected static function setGetMultiParams(\Memcached $memcached): void {
+      if (self::$getMultiHasTwoParams === null) {
+         $getMulti = new \ReflectionMethod($memcached, 'getMulti');
+         $numArgs = $getMulti->getNumberOfParameters();
+
+         self::$getMultiHasTwoParams = $numArgs === 2;
+      }
    }
 }
