@@ -24,10 +24,10 @@ class Memcached extends Backend {
    public static function create(\Memcached $memcached) {
       self::setGetMultiParams($memcached);
 
-      return new KeyFix(new static($memcached), self::MAX_KEY_LENGTH);
+      return new KeyFix(new self($memcached), self::MAX_KEY_LENGTH);
    }
 
-   private function __construct(\Memcached $memcached) {
+   protected function __construct(\Memcached $memcached) {
       $this->memcached = $memcached;
    }
 

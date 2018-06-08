@@ -5,6 +5,8 @@ namespace iFixit\Matryoshka;
 use iFixit\Matryoshka;
 
 class McRouter extends Memcached {
+   private const MCROUTER_INVALID_CHARACTERS = " \r\n";
+
    /**
     * Override the Memcahed factory method. Fail hard if binary protocol is
     * set on the \Memcached backend. Mcrouter only supports ASCII protocol.
@@ -14,7 +16,10 @@ class McRouter extends Memcached {
          throw new \InvalidArgumentException("Binary Protocol is not supported");
       }
 
-      return parent::create($memcached);
+      self::setGetMultiParams($memcached);
+
+      return new KeyFix(new self($memcached),
+       self::MAX_KEY_LENGTH, self::MCROUTER_INVALID_CHARACTERS);
    }
 
    /**
