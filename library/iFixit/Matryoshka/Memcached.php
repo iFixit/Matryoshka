@@ -133,7 +133,7 @@ class Memcached extends Backend {
     * The PHP 7 version of Memcached has a different API. We can tell which
     * API to use by how many arguments the method takes.
     */
-   protected static function setGetMultiParams(\Memcached $memcached): void {
+   protected static function setGetMultiParams(\Memcached $memcached) {
       if (self::$getMultiHasTwoParams === null) {
          $getMulti = new \ReflectionMethod($memcached, 'getMulti');
          $numArgs = $getMulti->getNumberOfParameters();
