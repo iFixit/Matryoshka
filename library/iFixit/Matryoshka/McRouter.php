@@ -38,7 +38,7 @@ class McRouter extends Memcached {
    public function setMultiple(array $values, $expiration = 0) {
       $success = true;
       foreach ($values as $key => $value) {
-         $success = $success && $this->set($key,$value, $expiration);
+         $success = $success && $this->set($key, $value, $expiration);
       }
       return $success;
    }
@@ -76,7 +76,6 @@ class McRouter extends Memcached {
       }
 
       $decrReturn = $this->memcached->decrement($key, $amount);
-
 
       if (is_int($decrReturn)) {
          return $decrReturn;
