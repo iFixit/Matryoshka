@@ -10,7 +10,7 @@ class Memcached extends Backend {
    // Is using instance of Memcache whose `getMulti` only accepts two args.
    protected static $getMultiHasTwoParams = null;
 
-   private $memcached;
+   protected $memcached;
 
    public static function isAvailable() {
       return class_exists('\Memcached', false);
@@ -22,19 +22,12 @@ class Memcached extends Backend {
     * truncated.
     */
    public static function create(\Memcached $memcached) {
-      // The PHP 7 version of Memcached has a different API. We can tell which
-      // API to use by how many arguments the method takes.
-      if (self::$getMultiHasTwoParams === null) {
-         $getMulti = new \ReflectionMethod($memcached, 'getMulti');
-         $numArgs = $getMulti->getNumberOfParameters();
-
-         self::$getMultiHasTwoParams = $numArgs === 2;
-      }
+      self::setGetMultiParams($memcached);
 
       return new KeyFix(new self($memcached), self::MAX_KEY_LENGTH);
    }
 
-   private function __construct(\Memcached $memcached) {
+   protected function __construct(\Memcached $memcached) {
       $this->memcached = $memcached;
    }
 
@@ -134,5 +127,18 @@ class Memcached extends Backend {
       }
 
       return true;
+   }
+
+   /**
+    * The PHP 7 version of Memcached has a different API. We can tell which
+    * API to use by how many arguments the method takes.
+    */
+   protected static function setGetMultiParams(\Memcached $memcached) {
+      if (self::$getMultiHasTwoParams === null) {
+         $getMulti = new \ReflectionMethod($memcached, 'getMulti');
+         $numArgs = $getMulti->getNumberOfParameters();
+
+         self::$getMultiHasTwoParams = $numArgs === 2;
+      }
    }
 }
