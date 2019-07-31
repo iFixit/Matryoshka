@@ -13,7 +13,8 @@
       }
    ],
    "require": {
-      "php": ">=5.4.0"
+      "php": ">=5.4.0",
+      "phpunit/phpunit": "5.7.27"
    },
    "autoload": {
       "psr-0": {"iFixit": "library/"}
