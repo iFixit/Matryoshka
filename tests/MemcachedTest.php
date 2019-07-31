@@ -31,4 +31,13 @@ class MemcachedTest extends AbstractBackendTest {
 
       $this->assertNull($backend->get($key));
    }
+
+   public function testFalse() {
+      $backend = $this->getBackend();
+      list($key1) = $this->getRandomKeyValue();
+
+      $this->assertNull($backend->get($key1));
+      $this->assertTrue($backend->set($key1, false));
+      $this->assertFalse($backend->get($key1));
+   }
 }
