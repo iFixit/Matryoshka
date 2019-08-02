@@ -68,7 +68,11 @@ class Memcached extends Backend {
    public function get($key) {
       $value = $this->memcached->get($key);
 
-      return $value === false ? self::MISS : $value;
+      if ($this->memcached->getResultCode() === \Memcached::RES_NOTFOUND) {
+         return self::MISS;
+      }
+
+      return $value;
    }
 
    public function getMultiple(array $keys) {
