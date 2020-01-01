@@ -21,23 +21,30 @@ abstract class Backend {
     * Associates the value with the key in the cache. The value will expire
     * after the specified expiration time in seconds.
     *
-    * @return true on success, false on failure
+    * @param string $key
+    * @param mixed $value
+    * @param int $expiration
+    * @return bool true on success, false on failure
     */
    public abstract function set($key, $value, $expiration = 0);
 
    /**
     * Sets multiple key/value pairs with the given expiration.
     *
-    * @param $values Array of [key => value] to set.
+    * @param array $values Array of [key => value] to set.
+    * @param int $expiration
     *
-    * @return True if all values set successfully, false otherwise.
+    * @return bool True if all values set successfully, false otherwise.
     */
    public abstract function setMultiple(array $values, $expiration = 0);
 
    /**
     * Same as set except it does nothing if the key already exists.
     *
-    * @return true on success, false if the key exists or the operation fails
+    * @param string $key
+    * @param mixed $value
+    * @param int $expiration
+    * @return bool true on success, false if the key exists or the operation fails
     */
    public abstract function add($key, $value, $expiration = 0);
 
@@ -49,7 +56,10 @@ abstract class Backend {
     *
     * Also see: decrement
     *
-    * @return the updated value, or false on failure
+    * @param string $key
+    * @param number $amount
+    * @param int $expiration
+    * @return number|false the updated value, or false on failure
     */
    public abstract function increment($key, $amount = 1, $expiration = 0);
 
@@ -57,14 +67,18 @@ abstract class Backend {
     * Same as increment but subtracts the amount rather than adding it. Some
     * backends have different rules for valid values and ranges.
     *
-    * @return the updated value, or false on failure
+    * @param string $key
+    * @param number $amount
+    * @param int $expiration
+    * @return number|false the updated value, or false on failure
     */
    public abstract function decrement($key, $amount = 1, $expiration = 0);
 
    /**
     * Retrieves the value associated with the key.
     *
-    * @return the value or null on failure or if it is not found
+    * @param string $key
+    * @return mixed the value or null on failure or if it is not found
     */
    public abstract function get($key);
 
@@ -73,10 +87,11 @@ abstract class Backend {
     *
     * Note: It is recommended to use getAndSetMultiple instead.
     *
-    * @param $keys An array of [key => id] where id is whatever the caller
-    *              wants to use to identify the missed values.
+    * @param array $keys An array of [key => id] where id is
+    *         whatever the caller wants to use to identify the missed values.
     *
-    * @return An array of found and missed values e.g.
+    * @return array{0:array, 1:array}
+    *         An array of found and missed values e.g.
     *         [
     *            [key => value],
     *            [key => id]
@@ -90,14 +105,15 @@ abstract class Backend {
    /**
     * Deletes the cache entry with the given key.
     *
-    * @return true on success, false on failure
+    * @param string $key
+    * @return bool true on success, false on failure
     */
    public abstract function delete($key);
 
    /**
     * Deletes multiple keys.
     *
-    * @return true on success, false on failure
+    * @return bool true on success, false on failure
     */
    public abstract function deleteMultiple(array $keys);
 
@@ -107,9 +123,8 @@ abstract class Backend {
     * $callback returns Backend::NULL, the corresponding set() call won't
     * happen.
     *
-    * @param $reset If true, always call the callback to reset the cache.
-    *
-    * @return the value
+    * @param mixed $reset If truthy, always call the callback to reset the cache.
+    * @return mixed the value
     */
    public function getAndSet($key, callable $callback, $expiration = 0,
     $reset = false) {
@@ -130,13 +145,15 @@ abstract class Backend {
     * Wrapper around getMultiple that uses the provided callback to retrieve
     * and populate the cache for any misses.
     *
-    * @param callback
-    *           @param missing Array of [key => id] that the caller needs to
+    * @param callable(array):array $callback
+    *           param $missing Array of [key => id] that the caller needs to
     *                          generate the values for.
-    *           @return Array of [key => value] for the found values. The
+    *           returns Array of [key => value] for the found values. The
     *                   order does not matter. Additional key/values in the
     *                   array that are not in the missing array are ignored.
-    * @return Array of [key => value] in the same order as the requested keys.
+    * @param int $expiration
+    * @return array
+    *         Array of [key => value] in the same order as the requested keys.
     *         This does not include values not returned by the callback.
     */
    public function getAndSetMultiple(array $keys, callable $callback,

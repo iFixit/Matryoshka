@@ -10,9 +10,9 @@ abstract class KeyChange extends BackendWrap {
    /**
     * Convert many keys at once.
     *
-    * @param $keys An array of [key => id].
+    * @param array $keys An array of [key => id].
     *
-    * @return An array of [changedKey => id].
+    * @return array An array of [changedKey => id].
     */
    public abstract function changeKeys(array $keys);
 
