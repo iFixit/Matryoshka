@@ -50,16 +50,16 @@ abstract class Backend {
 
    /**
     * Increments the value associated with the given key by the given amount.
-    * If the key does not exist or the existing value is not numeric, it is set
+    * If the key does not exist or the existing value is not an int, it is set
     * to the given value instead. Some backends have different rules for valid
     * values and ranges.
     *
     * Also see: decrement
     *
     * @param string $key
-    * @param number $amount
+    * @param int $amount
     * @param int $expiration
-    * @return number|false the updated value, or false on failure
+    * @return int|false the updated value, or false on failure
     */
    public abstract function increment($key, $amount = 1, $expiration = 0);
 
@@ -68,9 +68,9 @@ abstract class Backend {
     * backends have different rules for valid values and ranges.
     *
     * @param string $key
-    * @param number $amount
+    * @param int $amount
     * @param int $expiration
-    * @return number|false the updated value, or false on failure
+    * @return int|false the updated value, or false on failure
     */
    public abstract function decrement($key, $amount = 1, $expiration = 0);
 
