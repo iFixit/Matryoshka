@@ -93,7 +93,7 @@ class Local extends Backend {
          return [array_merge($keys, $localFound), []];
       }
 
-      list($backendFound, $backendMissing) =
+      [$backendFound, $backendMissing] =
        $this->backend->getMultiple($localMissing);
 
       // Merge the hits into the local cache.

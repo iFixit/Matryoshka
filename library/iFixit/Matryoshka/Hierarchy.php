@@ -99,7 +99,7 @@ class Hierarchy extends Backend {
       $found = [];
 
       for ($i = 0; $i < $this->backendCount; $i++) {
-         list($newFound, $missed) = $this->backends[$i]->getMultiple($missed);
+         [$newFound, $missed] = $this->backends[$i]->getMultiple($missed);
 
          // Remove misses.
          foreach ($newFound as $key => $value) {
