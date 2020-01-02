@@ -9,7 +9,7 @@ Matryoshka is a caching library for PHP built around nesting components like [Ru
 
 ## Motivation
 
-The [Memcache] and [Memcached] PHP client libraries offer fairly low level access to [memcached servers].
+The [Memcached] PHP client libraries offer fairly low level access to [memcached servers].
 Matryoshka adds convenience functions to simplify common operations that aren't covered by the client libraries.
 Most of the functionality is provided by nesting `Backend`s.
 For example, prefixing cache keys is accomplished by nesting an existing `Backend` within a `Prefix` backend.
@@ -17,23 +17,10 @@ This philosophy results in very modular components that are easy to swap in and 
 
 This concept is used to support key prefixing, disabling `get`s/`set`s/`delete`s, defining cache fallbacks in a hierarchy, storing values in clearable scope, and recording statistics.
 
-[Memcache]: http://php.net/memcache
 [Memcached]: http://php.net/memcached
 [memcached servers]: http://memcached.org
 
 ## Backends
-
-### Memcache
-
-Wraps the [Memcache] client library.
-
-```php
-$memcache = new Memcache();
-$memcache->pconnect('localhost', 11211);
-$cache = Matryoshka\Memcache::create($memcache);
-
-$value = $cache->get('key');
-```
 
 ### APCu
 
@@ -156,8 +143,8 @@ Note: This Backend is currently experimental due to some of its potentially unex
 ```php
 $cache = new Matryoshka\Hierarchy([
    new Matryoshka\Ephemeral(),
-   Matryoshka\Memcache::create(new Memcache('localhost')),
-   Matryoshka\Memcache::create(new Memcache($cacheServers)),
+   Matryoshka\Memcached::create(new Memcached('localhost')),
+   Matryoshka\Memcached::create(new Memcached($cacheServers)),
 ]);
 
 // This misses the first two caches (array and local memcached) but hits the
@@ -167,7 +154,7 @@ $value = $cache->getAndSet('key', function() {
    return 'value';
 }, 3600);
 // This is retrieved from the memory array without going all the way to
-// Memcache.
+// Memcached.
 $value = $cache->getAndSet('key', function() {
    return 'value';
 }, 3600);
@@ -178,7 +165,7 @@ $value = $cache->getAndSet('key', function() {
 Caches all values from the specified backend in a local array so subsequent requests for the same key can be fulfilled faster.
 
 ```php
-$cache = new Matryoshka\Local(new Memcache());
+$cache = new Matryoshka\Local(new Memcached());
 ```
 
 It's a faster version of:
@@ -186,7 +173,7 @@ It's a faster version of:
 ```php
 $cache = new Matryoshka\Hierarchy([
    new Matryoshka\Ephemeral(),
-   Matryoshka\Memcache::create(new Memcache('localhost'))
+   Matryoshka\Memcached::create(new Memcached('localhost'))
 ]);
 ```
 
@@ -209,9 +196,9 @@ Uses multiple scopes to store keys. Stores the scope or scopes in one backend an
 This primarily allows storing a scope in a shared but slower-to-acccess backend (for easy deletion), while storing the values in a local and faster backend for speedy access.
 
 ```php
-$scope1 = new Matryoshka\Scope($remoteMemcache, 'scope1');
-$scope2 = new Matryoshka\Scope($remoteMemcache, 'scope2');
-$multiScope = new Matryoshka\MultiScope($localMemcache, [
+$scope1 = new Matryoshka\Scope($remoteMemcached, 'scope1');
+$scope2 = new Matryoshka\Scope($remoteMemcached, 'scope2');
+$multiScope = new Matryoshka\MultiScope($localMemcached, [
    $scope1,
    $scope2
 ]);
