@@ -72,6 +72,7 @@ class Hierarchy extends Backend {
    }
 
    public function get($key) {
+      $value = null;
       for ($i = 0; $i < $this->backendCount; $i++) {
          $value = $this->backends[$i]->get($key);
 
