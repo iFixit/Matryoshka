@@ -12,6 +12,7 @@ use iFixit\Matryoshka;
  * take care before using this class.
  */
 class Hierarchy extends Backend {
+   /** @var Backend[] */
    private $backends;
    private $backendCount;
 

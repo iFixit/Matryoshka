@@ -13,7 +13,9 @@ use iFixit\Matryoshka;
  * ]);
  */
 class Local extends Backend {
+   /** @var Backend */
    private $backend;
+   /** @var array */
    protected $cache;
 
    public function __construct(Backend $backend) {
