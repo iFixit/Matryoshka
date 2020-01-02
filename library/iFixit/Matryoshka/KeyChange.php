@@ -5,7 +5,7 @@ namespace iFixit\Matryoshka;
 use iFixit\Matryoshka;
 
 abstract class KeyChange extends BackendWrap {
-   public abstract function changeKey($key);
+   public abstract function changeKey(string $key);
 
    /**
     * Convert many keys at once.

@@ -54,6 +54,8 @@ class KeyFix extends KeyChange {
    /**
     * Key is safe if it isn't too long, and if it doesn't contain any bad
     * characters.
+    *
+    * @param array-key $key
     */
    private function safeKey($key) {
       return strlen($key) <= $this->maxLength &&

@@ -124,9 +124,10 @@ abstract class Backend {
     * happen.
     *
     * @param mixed $reset If truthy, always call the callback to reset the cache.
+    *
     * @return mixed the value
     */
-   public function getAndSet($key, callable $callback, $expiration = 0,
+   public function getAndSet($key, callable $callback, int $expiration = 0,
     $reset = false) {
       $value = $reset ? self::MISS : $this->get($key);
 

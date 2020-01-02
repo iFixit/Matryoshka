@@ -21,7 +21,7 @@ class Scope extends Prefix {
       return $this->scopePrefix ?: $this->getScopePrefix();
    }
 
-   public function getScopePrefix($reset = false) {
+   public function getScopePrefix(bool $reset = false) {
       if ($this->scopePrefix === null || $reset) {
          $scopeValue = $this->backend->getAndSet($this->getScopeKey(),
           function() {
