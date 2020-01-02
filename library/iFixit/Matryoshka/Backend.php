@@ -78,7 +78,7 @@ abstract class Backend {
     * Retrieves the value associated with the key.
     *
     * @param string $key
-    * @return mixed the value or null on failure or if it is not found
+    * @return ?mixed the value or null on failure or if it is not found
     */
    public abstract function get($key);
 
