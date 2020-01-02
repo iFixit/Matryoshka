@@ -5,12 +5,12 @@ require_once 'AbstractBackendTest.php';
 use iFixit\Matryoshka;
 
 class MemcachedTest extends AbstractBackendTest {
-   protected function setUp() {
+   protected function setUp(): void {
       if (!Matryoshka\Memcached::isAvailable()) {
          $this->markTestSkipped('Backend not available!');
       }
 
-      return parent::setUp();
+      parent::setUp();
    }
 
    protected function getBackend() {
