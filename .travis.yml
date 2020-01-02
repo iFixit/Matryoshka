@@ -3,6 +3,7 @@ php:
   - 7.3
 services: memcached
 install: composer install
+before_script: echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 script:
   - ./vendor/bin/psalm
   - vendor/bin/phpunit tests
