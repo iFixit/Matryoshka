@@ -91,9 +91,8 @@ class Memcached extends Backend {
          $found = $this->memcached->getMulti(array_keys($keys),
           \Memcached::GET_PRESERVE_ORDER);
       } else {
-         $cas_tokens = null;
-         $found = $this->memcached->getMulti(array_keys($keys), $cas_tokens,
-          \Memcached::GET_PRESERVE_ORDER);
+         $found = $this->memcached->getMulti(array_keys($keys),
+          \Memcached::GET_PRESERVE_ORDER & \Memcached::GET_EXTENDED);
       }
 
       $missed = [];
