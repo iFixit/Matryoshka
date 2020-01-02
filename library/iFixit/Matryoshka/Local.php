@@ -27,7 +27,7 @@ class Local extends Backend {
     * Clears the locally cached values so all new requests pull data from the
     * backend.
     */
-   public function clear() {
+   public function clear(): void {
       $this->cache = [];
    }
 
