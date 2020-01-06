@@ -12,6 +12,7 @@ use iFixit\Matryoshka;
  * take care before using this class.
  */
 class Hierarchy extends Backend {
+   /** @var Backend[] */
    private $backends;
    private $backendCount;
 
@@ -50,7 +51,7 @@ class Hierarchy extends Backend {
    // authoritative source of the value so the incremented value is set on all
    // of the other backends but the results of those sets aren't verified. It
    // also resets the expiration time.
-   private function doIncrement($method, $key, $amount = 1, $expiration = 0) {
+   private function doIncrement(string $method, string $key, int $amount = 1, int $expiration = 0) {
       if (empty($this->backends)) {
          return false;
       }
@@ -71,6 +72,7 @@ class Hierarchy extends Backend {
    }
 
    public function get($key) {
+      $value = null;
       for ($i = 0; $i < $this->backendCount; $i++) {
          $value = $this->backends[$i]->get($key);
 
@@ -97,7 +99,7 @@ class Hierarchy extends Backend {
       $found = [];
 
       for ($i = 0; $i < $this->backendCount; $i++) {
-         list($newFound, $missed) = $this->backends[$i]->getMultiple($missed);
+         [$newFound, $missed] = $this->backends[$i]->getMultiple($missed);
 
          // Remove misses.
          foreach ($newFound as $key => $value) {

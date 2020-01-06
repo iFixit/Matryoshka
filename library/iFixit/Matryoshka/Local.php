@@ -13,7 +13,9 @@ use iFixit\Matryoshka;
  * ]);
  */
 class Local extends Backend {
+   /** @var Backend */
    private $backend;
+   /** @var array */
    protected $cache;
 
    public function __construct(Backend $backend) {
@@ -25,7 +27,7 @@ class Local extends Backend {
     * Clears the locally cached values so all new requests pull data from the
     * backend.
     */
-   public function clear() {
+   public function clear(): void {
       $this->cache = [];
    }
 
@@ -91,7 +93,7 @@ class Local extends Backend {
          return [array_merge($keys, $localFound), []];
       }
 
-      list($backendFound, $backendMissing) =
+      [$backendFound, $backendMissing] =
        $this->backend->getMultiple($localMissing);
 
       // Merge the hits into the local cache.

@@ -17,8 +17,8 @@ class HierarchyTest extends AbstractBackendTest {
          new Matryoshka\Ephemeral(),
          // Use Memcache as the backend if it exists, otherwise just use an
          // in memory array.
-         Matryoshka\Memcache::isAvailable() ?
-          Matryoshka\Memcache::create($this->getMemcache()) :
+         Matryoshka\Memcached::isAvailable() ?
+          Matryoshka\Memcached::create($this->getMemcached()) :
           new Matryoshka\Ephemeral()
       ];
       $hierarchy = new Matryoshka\Hierarchy($backends);

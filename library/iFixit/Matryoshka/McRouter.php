@@ -16,8 +16,6 @@ class McRouter extends Memcached {
          throw new \InvalidArgumentException("Binary Protocol is not supported");
       }
 
-      self::setGetMultiParams($memcached);
-
       return new KeyFix(new self($memcached),
        self::MAX_KEY_LENGTH, self::MCROUTER_INVALID_CHARACTERS);
    }

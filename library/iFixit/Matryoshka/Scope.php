@@ -21,7 +21,7 @@ class Scope extends Prefix {
       return $this->scopePrefix ?: $this->getScopePrefix();
    }
 
-   public function getScopePrefix($reset = false) {
+   public function getScopePrefix(bool $reset = false) {
       if ($this->scopePrefix === null || $reset) {
          $scopeValue = $this->backend->getAndSet($this->getScopeKey(),
           function() {
@@ -41,10 +41,8 @@ class Scope extends Prefix {
    /**
     * Deletes the scope which effectively invalidates all cache entries under
     * this scope.
-    *
-    * @return true on success.
     */
-   public function deleteScope() {
+   public function deleteScope(): bool {
       // Delete the scope by setting a new value for it.
       $prefix = $this->getScopePrefix($reset = true);
 

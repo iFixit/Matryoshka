@@ -49,7 +49,11 @@ class APCu extends Backend {
          return [[],[]];
       }
 
-      // Default to an empty array in case no keys were found.
+      /**
+       * @psalm-suppress InvalidArgument
+       *
+       * Default to an empty array in case no keys were found.
+       */
       $hits = apcu_fetch(array_keys($keys)) ?: [];
 
       $found = [];
@@ -78,6 +82,12 @@ class APCu extends Backend {
       // when you provide an array of keys, it provides an array of errors (if any)
       // so the only successful case is no errors (empty array).
       $ret = apcu_delete($keys);
+      /**
+       * In the docs, the apcu_delete returns an array if passed one.
+       * Ref: https://www.php.net/manual/en/function.apcu-delete.php
+       * Psalm gets this wrong.
+       * @psalm-suppress InvalidArgument
+       */
       return empty($ret);
    }
 }

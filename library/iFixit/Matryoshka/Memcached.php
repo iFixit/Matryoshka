@@ -7,9 +7,6 @@ use iFixit\Matryoshka;
 class Memcached extends Backend {
    const MAX_KEY_LENGTH = 250;
 
-   // Is using instance of Memcache whose `getMulti` only accepts two args.
-   protected static $getMultiHasTwoParams = null;
-
    protected $memcached;
 
    public static function isAvailable() {
@@ -22,8 +19,6 @@ class Memcached extends Backend {
     * truncated.
     */
    public static function create(\Memcached $memcached) {
-      self::setGetMultiParams($memcached);
-
       return new KeyFix(new self($memcached), self::MAX_KEY_LENGTH);
    }
 
@@ -85,16 +80,8 @@ class Memcached extends Backend {
        * the order that they were requested with null indicating a miss which
        * is exactly what is needed for the found array.
        */
-      if (self::$getMultiHasTwoParams === true) {
-         // The PHP7 version of Memcached (at the time of this writing) does not
-         // accept a `cas_token` param.
-         $found = $this->memcached->getMulti(array_keys($keys),
-          \Memcached::GET_PRESERVE_ORDER);
-      } else {
-         $cas_tokens = null;
-         $found = $this->memcached->getMulti(array_keys($keys), $cas_tokens,
-          \Memcached::GET_PRESERVE_ORDER);
-      }
+      $found = $this->memcached->getMulti(array_keys($keys),
+       \Memcached::GET_PRESERVE_ORDER);
 
       $missed = [];
       foreach ($keys as $key => $id) {
@@ -131,18 +118,5 @@ class Memcached extends Backend {
       }
 
       return true;
-   }
-
-   /**
-    * The PHP 7 version of Memcached has a different API. We can tell which
-    * API to use by how many arguments the method takes.
-    */
-   protected static function setGetMultiParams(\Memcached $memcached) {
-      if (self::$getMultiHasTwoParams === null) {
-         $getMulti = new \ReflectionMethod($memcached, 'getMulti');
-         $numArgs = $getMulti->getNumberOfParameters();
-
-         self::$getMultiHasTwoParams = $numArgs === 2;
-      }
    }
 }

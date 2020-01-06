@@ -217,13 +217,6 @@ class MatryoshkaBenchmark {
       }
    }
 
-   private static function getMemcache() {
-      $memcache = new Memcache();
-      $memcache->pconnect('localhost', 11211);
-
-      return $memcache;
-   }
-
    private static function getMemcached() {
       $memcached = new Memcached();
       $memcached->addServer('localhost', 11211);
@@ -275,19 +268,6 @@ class MatryoshkaBenchmark {
             }
          )
       ];
-
-      if (Matryoshka\Memcache::isAvailable()) {
-         $allBackends['MemArrayMemcacheHier'] = new Matryoshka\Hierarchy([
-            new Matryoshka\Ephemeral(),
-            Matryoshka\Memcache::create(self::getMemcache())
-         ]);
-         $allBackends['LocalMemcache'] = new Matryoshka\Local(
-            Matryoshka\Memcache::create(self::getMemcache())
-         );
-         $allBackends['Memcache'] = Matryoshka\Memcache::create(
-            self::getMemcache()
-         );
-      }
 
       if (Matryoshka\Memcached::isAvailable()) {
          $allBackends['Memcached'] = Matryoshka\Memcached::create(
