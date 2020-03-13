@@ -60,12 +60,12 @@ class Memcached extends Backend {
        $expiration);
    }
 
-   /** @return mixed|false|null */
+   /** @return mixed|null */
    public function get($key) {
       /** @var mixed|false */
       $value = $this->memcached->get($key);
 
-      if ($this->memcached->getResultCode() === \Memcached::RES_NOTFOUND) {
+      if ($this->memcached->getResultCode() !== \Memcached::RES_SUCCESS) {
          return self::MISS;
       }
 
