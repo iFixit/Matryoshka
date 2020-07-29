@@ -69,25 +69,17 @@ class Memcached extends Backend {
       $value = $this->memcached->get($key);
       $result = $this->memcached->getResultCode();
 
-      if ($this->isSuccess($result)) {
+      if ($result === \Memcached::RES_SUCCESS) {
          /** @var T */
          return $value;
       }
 
-      if ($this->isMiss($result)) {
+      if ($result === \Memcached::RES_NOTFOUND) {
          return self::MISS;
       }
 
       $errorMessage = $this->memcached->getResultMessage();
       throw new \MemcachedException($errorMessage, $result);
-   }
-
-   private function isMiss(int $resultCode): bool {
-      return $resultCode === \Memcached::RES_NOTFOUND;
-   }
-
-   private function isSuccess(int $resultCode): bool {
-      return $resultCode === \Memcached::RES_SUCCESS;
    }
 
    public function getMultiple(array $keys) {
