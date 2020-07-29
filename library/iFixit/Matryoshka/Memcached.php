@@ -9,35 +9,6 @@ class Memcached extends Backend {
 
    protected $memcached;
 
-   private const ERRORS = [
-      \Memcached::RES_FAILURE => 'The operation failed in some fashion.',
-      \Memcached::RES_HOST_LOOKUP_FAILURE => 'DNS lookup failed.',
-      \Memcached::RES_UNKNOWN_READ_FAILURE => 'Failed to read network data.',
-      \Memcached::RES_PROTOCOL_ERROR => 'Bad command in memcached protocol.',
-      \Memcached::RES_CLIENT_ERROR => 'Error on the client side.',
-      \Memcached::RES_SERVER_ERROR => 'Error on the server side.',
-      \Memcached::RES_WRITE_FAILURE => 'Failed to write network data.',
-      \Memcached::RES_DATA_EXISTS => 'Failed to do compare-and-swap: item you are trying to store has been modified since you last fetched it.',
-      \Memcached::RES_NOTSTORED => 'Item was not stored: but not because of an error. This normally means that either the condition for an "add" or a "replace" command was not met, or that the item is in a delete queue.',
-      \Memcached::RES_PARTIAL_READ => 'Partial network data read error.',
-      \Memcached::RES_SOME_ERRORS => 'Some errors occurred during multi-get.',
-      \Memcached::RES_NO_SERVERS => 'Server list is empty.',
-      \Memcached::RES_END => 'End of result set.',
-      \Memcached::RES_ERRNO => 'System error.',
-      \Memcached::RES_BUFFERED => 'The operation was buffered.',
-      \Memcached::RES_TIMEOUT => 'The operation timed out.',
-      \Memcached::RES_BAD_KEY_PROVIDED => 'Bad key.',
-      \Memcached::RES_CONNECTION_SOCKET_CREATE_FAILURE => 'Failed to create network socket.',
-      \Memcached::RES_PAYLOAD_FAILURE => 'Payload failure: could not compress/decompress or serialize/unserialize the value.',
-      \Memcached::RES_AUTH_PROBLEM => 'Auth Problem',
-      \Memcached::RES_AUTH_FAILURE => 'Auth Failure',
-      \Memcached::RES_AUTH_CONTINUE => 'Auth Continue',
-      \Memcached::RES_E2BIG => 'E2big',
-      \Memcached::RES_KEY_TOO_BIG => 'Key Too Big',
-      \Memcached::RES_SERVER_TEMPORARILY_DISABLED => 'Server Temporarily Disabled',
-      \Memcached::RES_SERVER_MEMORY_ALLOCATION_FAILURE => 'Server Memory Allocation Failure',
-   ];
-
    public static function isAvailable() {
       return class_exists('\Memcached', false);
    }
@@ -119,10 +90,8 @@ class Memcached extends Backend {
    }
 
    private function getError(int $resultCode): \MemcachedException {
-      $hasKey = array_key_exists($resultCode, self::ERRORS);
-      $defaultMessage = "An unknown Memcached error occurred. Result Code: {$resultCode}";
-      $errorMessage = $hasKey ? self::ERRORS[$resultCode] : $defaultMessage;
-      return new \MemcachedException($errorMessage);
+      $errorMessage = $this->memcached->getResultMessage();
+      return new \MemcachedException($errorMessage, $resultCode);
    }
 
    public function getMultiple(array $keys) {
