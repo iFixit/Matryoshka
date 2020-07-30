@@ -60,14 +60,26 @@ class Memcached extends Backend {
        $expiration);
    }
 
+   /**
+    * @template T
+    * @return T|self::MISS
+    */
    public function get($key) {
+      /** @var T|false */
       $value = $this->memcached->get($key);
+      $resultCode = $this->memcached->getResultCode();
 
-      if ($this->memcached->getResultCode() === \Memcached::RES_NOTFOUND) {
+      if ($resultCode === \Memcached::RES_SUCCESS) {
+         /** @var T */
+         return $value;
+      }
+
+      if ($resultCode === \Memcached::RES_NOTFOUND) {
          return self::MISS;
       }
 
-      return $value;
+      $errorMessage = $this->memcached->getResultMessage();
+      throw new \MemcachedException($errorMessage, $resultCode);
    }
 
    public function getMultiple(array $keys) {
