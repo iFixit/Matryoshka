@@ -32,6 +32,24 @@ class MemcachedTest extends AbstractBackendTest {
       $this->assertNull($backend->get($key));
    }
 
+    public function testFailureException()
+    {
+      [$key] = $this->getRandomKeyValue();
+      $badMemcached = new class extends \Memcached {
+         public function get($key, $cache_cb = null, $get_flags = null) {
+            return false;
+         }
+
+         public function getResultCode() {
+            return \Memcached::RES_FAILURE;
+         }
+      };
+      $backend = Matryoshka\Memcached::create($badMemcached);
+
+      $this->expectExceptionCode(\Memcached::RES_FAILURE);
+      $backend->get($key);
+    }
+
    public function testFalse() {
       $backend = $this->getBackend();
       list($key1) = $this->getRandomKeyValue();
