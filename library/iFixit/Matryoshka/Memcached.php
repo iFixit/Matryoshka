@@ -7,6 +7,15 @@ use iFixit\Matryoshka;
 class Memcached extends Backend {
    const MAX_KEY_LENGTH = 250;
 
+   /**
+    * From: https://github.com/memcached/memcached/blob/master/doc/protocol.txt
+    * > Currently the length limit of a key is set at 250 characters
+    * > the key must not include control characters or whitespace.
+    *
+    * See: https://www.oreilly.com/library/view/programming-php-3rd/9781449361068/ch04s08.html#character_classes-id2
+    */
+   const INVALID_CHARS_REGEX = '/[^[:graph:]]/';
+
    protected $memcached;
 
    public static function isAvailable() {
@@ -19,7 +28,7 @@ class Memcached extends Backend {
     * truncated.
     */
    public static function create(\Memcached $memcached) {
-      return new KeyFix(new self($memcached), self::MAX_KEY_LENGTH);
+      return new KeyFix(new self($memcached), self::MAX_KEY_LENGTH, self::INVALID_CHARS_REGEX);
    }
 
    protected function __construct(\Memcached $memcached) {

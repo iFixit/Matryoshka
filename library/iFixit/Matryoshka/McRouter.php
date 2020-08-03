@@ -5,7 +5,7 @@ namespace iFixit\Matryoshka;
 use iFixit\Matryoshka;
 
 class McRouter extends Memcached {
-   const MCROUTER_INVALID_CHARACTERS = " \r\n";
+   const MCROUTER_INVALID_CHARACTERS_REGEX = "[ \r\n]";
 
    /**
     * Override the Memcahed factory method. Fail hard if binary protocol is
@@ -17,7 +17,7 @@ class McRouter extends Memcached {
       }
 
       return new KeyFix(new self($memcached),
-       self::MAX_KEY_LENGTH, self::MCROUTER_INVALID_CHARACTERS);
+       self::MAX_KEY_LENGTH, self::MCROUTER_INVALID_CHARACTERS_REGEX);
    }
 
    /**
