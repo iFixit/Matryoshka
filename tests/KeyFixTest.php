@@ -72,7 +72,7 @@ class KeyFixTest extends AbstractBackendTest {
    }
 
    public function testCustomBadChars() {
-      $badChar = '[a]';
+      $badChar = '/a/';
 
       $memoryCache = new TestEphemeral();
       $cache = new Matryoshka\KeyFix($memoryCache, 40, $badChar);
