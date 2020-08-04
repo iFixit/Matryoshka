@@ -23,17 +23,11 @@ class KeyFix extends KeyChange {
           'Max length must be larger than ' . self::MD5_STRLEN);
       }
 
-      $isRegex = @preg_match($invalidRegex, '') !== false;
-
-      if (!is_string($invalidRegex) || !$isRegex) {
-         throw new \InvalidArgumentException(
-          'Not a valid regex: ' . $invalidRegex);
-      }
-
       parent::__construct($backend);
 
       $this->maxLength = $maxLength;
       $this->invalidRegex = $invalidRegex;
+      $this->safeKey(''); // throws is regex is invalid
    }
 
    public function changeKey($key) {
