@@ -46,14 +46,14 @@ class KeyFixTest extends AbstractBackendTest {
    public function testValidation() {
       try {
          new Matryoshka\KeyFix(new TestEphemeral(), 5, Memcached::INVALID_CHARS_REGEX);
-         $this->fail("Doesn't throw InvalidArgumentException");
+         $this->fail("Doesn't complain about bad regex");
       } catch (Throwable $e) {
          // Do nothing.
       }
 
       try {
          new Matryoshka\KeyFix(new TestEphemeral(), 40, '');
-         $this->fail("Doesn't throw InvalidArgumentException");
+         $this->fail("Doesn't complain about bad regex");
       } catch (Throwable $e) {
          // Do nothing.
       }
