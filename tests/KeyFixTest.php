@@ -3,10 +3,11 @@
 require_once 'AbstractBackendTest.php';
 
 use iFixit\Matryoshka;
+use iFixit\Matryoshka\Memcached;
 
 class KeyFixTest extends AbstractBackendTest {
    protected function getBackend() {
-      return new Matryoshka\KeyFix(new Matryoshka\Ephemeral(), 40);
+      return new Matryoshka\KeyFix(new Matryoshka\Ephemeral(), 40, Memcached::INVALID_CHARS_REGEX);
    }
 
    public function testKeyShorten() {
@@ -15,7 +16,7 @@ class KeyFixTest extends AbstractBackendTest {
       list($key) = $this->getRandomKeyValue();
       $longKey = str_repeat($key, 10);
       $memoryCache = new TestEphemeral();
-      $cache = new Matryoshka\KeyFix($memoryCache, $maxLength);
+      $cache = new Matryoshka\KeyFix($memoryCache, $maxLength,  Memcached::INVALID_CHARS_REGEX);
 
       $keys = [
          'short',
@@ -44,23 +45,23 @@ class KeyFixTest extends AbstractBackendTest {
 
    public function testValidation() {
       try {
-         new Matryoshka\KeyFix(new TestEphemeral(), 5);
-         $this->fail("Doesn't throw InvalidArgumentException");
-      } catch (InvalidArgumentException $e) {
+         new Matryoshka\KeyFix(new TestEphemeral(), 5, Memcached::INVALID_CHARS_REGEX);
+         $this->fail("Doesn't complain about bad regex");
+      } catch (Throwable $e) {
          // Do nothing.
       }
 
       try {
          new Matryoshka\KeyFix(new TestEphemeral(), 40, '');
-         $this->fail("Doesn't throw InvalidArgumentException");
-      } catch (InvalidArgumentException $e) {
+         $this->fail("Doesn't complain about bad regex");
+      } catch (Throwable $e) {
          // Do nothing.
       }
    }
 
    public function testNoBadChars() {
       $memoryCache = new TestEphemeral();
-      $cache = new Matryoshka\KeyFix($memoryCache, 40);
+      $cache = new Matryoshka\KeyFix($memoryCache, 40,  Memcached::INVALID_CHARS_REGEX);
 
       list($goodKey) = $this->getRandomKeyValue();
       $cache->set($goodKey, $goodKey);
@@ -69,26 +70,9 @@ class KeyFixTest extends AbstractBackendTest {
          $this->assertSame($fixed, $original);
       }
    }
-      
-   public function testDefaultBadChars() {
-      $memoryCache = new TestEphemeral();
-      $cache = new Matryoshka\KeyFix($memoryCache, 40);
-
-      // Empty string and Newline are the default characters this backend fixes.
-      foreach([' ', "\n"] as $badChar) {
-         list($key) = $this->getRandomKeyValue();
-         $badKey = $key . $badChar;
-
-         $cache->set($badKey, $badKey);
-      }
-
-      foreach ($memoryCache->getCache() as $fixed => $original) {
-         $this->assertNotSame($fixed, $original);
-      }
-   }
 
    public function testCustomBadChars() {
-      $badChar = 'a';
+      $badChar = '/a/';
 
       $memoryCache = new TestEphemeral();
       $cache = new Matryoshka\KeyFix($memoryCache, 40, $badChar);

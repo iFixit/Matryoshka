@@ -12,31 +12,28 @@ class KeyFix extends KeyChange {
    const MD5_STRLEN = 32;
 
    private $maxLength;
-   private $invalidChars;
+
+   /** @var string */
+   private $invalidRegex;
 
    public function __construct(Backend $backend, $maxLength,
-    $invalidChars = " \n") {
+    $invalidRegex) {
       if ($maxLength < self::MD5_STRLEN) {
          throw new \InvalidArgumentException(
           'Max length must be larger than ' . self::MD5_STRLEN);
       }
 
-      if (!is_string($invalidChars) || $invalidChars === '') {
-         throw new \InvalidArgumentException(
-          'Bad character mask: ' . $invalidChars);
-      }
-
       parent::__construct($backend);
 
       $this->maxLength = $maxLength;
-      $this->invalidChars = $invalidChars;
+      $this->invalidRegex = $invalidRegex;
+      $this->safeKey(''); // throws is regex is invalid
    }
 
    public function changeKey($key) {
       if ($this->safeKey($key)) {
          return $key;
       }
-
       return md5($key);
    }
 
@@ -59,6 +56,6 @@ class KeyFix extends KeyChange {
     */
    private function safeKey($key) {
       return strlen($key) <= $this->maxLength &&
-       strpbrk($key, $this->invalidChars) === false;
+      preg_match($this->invalidRegex, $key) === 0;
    }
 }
