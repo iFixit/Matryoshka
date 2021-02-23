@@ -36,11 +36,11 @@ class MemcachedTest extends AbstractBackendTest {
     {
       [$key] = $this->getRandomKeyValue();
       $badMemcached = new class extends \Memcached {
-         public function get($key, $cache_cb = null, $get_flags = null) {
+         public function get($key, $cache_cb = null, $get_flags = null): mixed {
             return false;
          }
 
-         public function getResultCode() {
+         public function getResultCode(): int {
             return \Memcached::RES_FAILURE;
          }
       };
