@@ -2,9 +2,10 @@ language: php
 php:
   - 7.3
   - 7.4
+  - 8.0
 services: memcached
 install: composer install
-before_script: echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+before_script: yes '' | pecl install -f memcached
 script:
   - ./vendor/bin/psalm
   - vendor/bin/phpunit tests
