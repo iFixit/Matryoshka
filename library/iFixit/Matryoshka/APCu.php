@@ -13,6 +13,12 @@ class APCu extends Backend {
       return apcu_store($key, $value, $expiration);
    }
 
+   /**
+    * TODO: the other backends' setMultiple() returns a bool, we should fix the way we're
+    * handling this for consistency. See: https://github.com/iFixit/Matryoshka/issues/30
+    *
+    * @return array Returns array of keys that had errors
+    */
    public function setMultiple(array $values, $expiration = 0) {
       return apcu_store($values, null, $expiration);
    }
