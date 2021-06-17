@@ -36,7 +36,12 @@ class Memcached extends Backend {
    }
 
    public function set($key, $value, $expiration = 0) {
-      return $this->memcached->set($key, $value, $expiration);
+      $setValue = $this->memcached->set($key, $value, $expiration);
+
+      if ($this->memcached->getResultCode() === \Memcached::RES_E2BIG) {
+         throw new ValueTooLargeException();
+      }
+      return $setValue;
    }
 
    public function setMultiple(array $values, $expiration = 0) {
