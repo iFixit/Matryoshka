@@ -37,10 +37,13 @@ class Memcached extends Backend {
 
    public function set($key, $value, $expiration = 0) {
       $setValue = $this->memcached->set($key, $value, $expiration);
+      $resultCode = $this->memcached->getResultCode();
 
-      if ($this->memcached->getResultCode() === \Memcached::RES_E2BIG) {
-         throw new ValueTooLargeException();
+      if ($resultCode !== \Memcached::RES_SUCCESS) {
+         $errorMessage = $this->memcached->getResultMessage();
+         throw new \MemcachedException($errorMessage, $resultCode);
       }
+
       return $setValue;
    }
 
