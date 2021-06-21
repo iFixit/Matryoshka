@@ -36,7 +36,7 @@ class Memcached extends Backend {
    }
 
    public function set($key, $value, $expiration = 0) {
-      if ($this->memcached->set($key, $value, $expiration) {
+      if ($this->memcached->set($key, $value, $expiration)) {
          return true;
       }
       
