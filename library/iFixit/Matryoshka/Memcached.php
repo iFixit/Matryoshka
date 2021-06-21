@@ -36,15 +36,14 @@ class Memcached extends Backend {
    }
 
    public function set($key, $value, $expiration = 0) {
-      $setValue = $this->memcached->set($key, $value, $expiration);
-      $resultCode = $this->memcached->getResultCode();
-
-      if ($resultCode !== \Memcached::RES_SUCCESS) {
-         $errorMessage = $this->memcached->getResultMessage();
-         throw new \MemcachedException($errorMessage, $resultCode);
+      if ($this->memcached->set($key, $value, $expiration) {
+         return true;
       }
-
-      return $setValue;
+      
+      // The set failed so throw a detailed exception.
+      $resultCode = $this->memcached->getResultCode();
+      $errorMessage = $this->memcached->getResultMessage();
+      throw new \MemcachedException($errorMessage, $resultCode);
    }
 
    public function setMultiple(array $values, $expiration = 0) {
