@@ -58,4 +58,23 @@ class MemcachedTest extends AbstractBackendTest {
       $this->assertTrue($backend->set($key1, false));
       $this->assertFalse($backend->get($key1));
    }
+
+   public function testSetValueTooBig() {
+      $this->expectException(MemcachedException::class);
+      $this->expectExceptionCode(\Memcached::RES_E2BIG);
+
+      $badMemcached = new class extends \Memcached {
+         public function set($key, $value = null, $expiration = null) {
+            return false;
+         }
+
+         public function getResultCode() {
+            return \Memcached::RES_E2BIG;
+         }
+      };
+
+      $backend = Matryoshka\Memcached::create($badMemcached);
+      [$key, $value] = $this->getRandomKeyValue();
+      $backend->set($key, $value);
+   }
 }
