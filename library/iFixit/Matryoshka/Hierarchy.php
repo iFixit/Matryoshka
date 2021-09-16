@@ -149,4 +149,14 @@ class Hierarchy extends Backend {
 
       return $success;
    }
+
+   public function getAbsoluteKey($key) {
+      $keys = [];
+
+      foreach ($this->backends as $backend) {
+         $keys[] = $backend->getAbsoluteKey($key);
+      }
+
+      return implode(" , ", $keys);
+   }
 }

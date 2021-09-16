@@ -77,4 +77,11 @@ class MemcachedTest extends AbstractBackendTest {
       [$key, $value] = $this->getRandomKeyValue();
       $backend->set($key, $value);
    }
+
+   public function testAbsoluteKey() {
+      $backend = $this->getBackend();
+      [$key] = $this->getRandomKeyValue();
+
+      $this->assertEquals($key,  $backend->getAbsoluteKey($key));
+   }
 }

@@ -42,4 +42,13 @@ class ScopeTest extends AbstractBackendTest {
 
       $this->assertSame($value1, $scopedCache->get($key1));
    }
+
+   public function testAbsoluteKey() {
+      $memoryCache = new Matryoshka\Ephemeral();
+      $scope = 'scope';
+      $scopedCache = new Matryoshka\Scope($memoryCache, $scope);
+      [$key] = $this->getRandomKeyValue();
+
+      $this->assertEquals($scopedCache->getScopePrefix() . $key, $scopedCache->getAbsoluteKey($key));
+   }
 }

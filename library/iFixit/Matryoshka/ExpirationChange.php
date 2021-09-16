@@ -39,4 +39,8 @@ class ExpirationChange extends BackendWrap {
       return $this->backend->decrement($key, $amount,
        call_user_func($this->changeExpiration, $expiration));
    }
+
+   public function getAbsoluteKey($key) {
+      return $this->backend->getAbsoluteKey($key);
+   }
 }

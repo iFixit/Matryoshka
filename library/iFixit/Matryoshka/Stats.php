@@ -152,4 +152,8 @@ class Stats extends Backend {
 
       return $success;
    }
+
+   public function getAbsoluteKey($key) {
+      return $this->backend->getAbsoluteKey($key);
+   }
 }

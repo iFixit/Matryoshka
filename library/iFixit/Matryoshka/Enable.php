@@ -96,4 +96,8 @@ class Enable extends Backend {
          return false;
       }
    }
+
+   public function getAbsoluteKey($key) {
+      return $this->backend->getAbsoluteKey($key);
+   }
 }

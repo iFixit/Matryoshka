@@ -96,4 +96,8 @@ class APCu extends Backend {
        */
       return empty($ret);
    }
+
+   public function getAbsoluteKey($key) {
+      return $key;
+   }
 }
