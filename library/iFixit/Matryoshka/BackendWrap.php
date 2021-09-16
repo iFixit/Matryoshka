@@ -53,4 +53,8 @@ abstract class BackendWrap extends Backend {
    public function deleteMultiple(array $keys) {
       return $this->backend->deleteMultiple($keys);
    }
+
+   public function getAbsoluteKey($key) {
+      return $this->backend->getAbsoluteKey($key);
+   }
 }

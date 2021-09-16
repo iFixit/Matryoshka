@@ -53,4 +53,14 @@ class KeyShortenTest extends AbstractBackendTest {
          // Do nothing.
       }
    }
+
+   public function testAbsoluteKey() {
+      $backend = $this->getBackend();
+      [$key, $value] = $this->getRandomKeyValue();
+      $longKey = str_repeat($key, 10);
+
+      $absoluteKey = $backend->getAbsoluteKey($longKey);
+
+      $this->assertTrue(strlen($absoluteKey) <= 40);
+   }
 }

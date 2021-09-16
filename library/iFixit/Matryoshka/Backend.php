@@ -191,4 +191,10 @@ abstract class Backend {
 
       return $found;
    }
+
+   /**
+    * @param string $key
+    * @return string
+    */
+    public abstract function getAbsoluteKey($key);
 }

@@ -147,4 +147,8 @@ class Memcached extends Backend {
 
       return true;
    }
+
+   public function getAbsoluteKey($key) {
+      return $key;
+   }
 }

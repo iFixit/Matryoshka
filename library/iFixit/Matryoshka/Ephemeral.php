@@ -103,4 +103,8 @@ class Ephemeral extends Backend {
 
       return $success;
    }
+
+   public function getAbsoluteKey($key) {
+      return $key;
+   }
 }

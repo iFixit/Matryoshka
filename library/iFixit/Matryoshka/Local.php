@@ -141,4 +141,8 @@ class Local extends Backend {
 
       return $success;
    }
+
+   public function getAbsoluteKey($key) {
+      return $this->backend->getAbsoluteKey($key);
+   }
 }

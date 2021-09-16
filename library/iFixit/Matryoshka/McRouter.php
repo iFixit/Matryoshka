@@ -85,4 +85,8 @@ class McRouter extends Memcached {
       $this->set($key, 0, $expiration);
       return 0;
    }
+
+   public function getAbsoluteKey($key) {
+      return $key;
+   }
 }

@@ -30,4 +30,13 @@ class PrefixTest extends AbstractBackendTest {
       $this->assertNull($memoryCache->get("{$prefix}{$key}"));
       $this->assertNull($memoryCache->get($key));
    }
+
+   public function testAbsoluteKey() {
+      $memoryCache = new Matryoshka\Ephemeral();
+      $prefix = 'prefix';
+      $prefixedCache = new Matryoshka\Prefix($memoryCache, $prefix);
+      [$key] = $this->getRandomKeyValue();
+
+      $this->assertEquals($prefixedCache->getPrefix() . $key, $prefixedCache->getAbsoluteKey($key));
+   }
 }

@@ -77,4 +77,8 @@ abstract class KeyChange extends BackendWrap {
       $changedKeys = array_flip($this->changeKeys(array_flip($keys)));
       return $this->backend->deleteMultiple($changedKeys);
    }
+
+   public function getAbsoluteKey($key) {
+      return $this->backend->getAbsoluteKey($this->changeKey($key));
+   }
 }
