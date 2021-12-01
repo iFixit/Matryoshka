@@ -57,7 +57,7 @@ jobs:
       run: ./vendor/bin/phpunit tests
 
     - name: Static Analysis
-      run: ./vendor/bin/psalm --update-baseline --no-cache
+      run: ./vendor/bin/psalm
 
     - name: Benchmarks
       run: php benchmarks/MatryoshkaBenchmark.php
