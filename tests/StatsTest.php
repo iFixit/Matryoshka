@@ -43,7 +43,7 @@ class StatsTest extends AbstractBackendTest {
          } else if (strpos($stat, '_count') !== false) {
             $this->assertSame(1, $value, $stat);
          } else if (strpos($stat, '_time') !== false) {
-            $this->assertGreaterThan(0, $value, $stat);
+            $this->assertGreaterThanOrEqual(0.0, $value, $stat);
             $this->assertLessThan($maxTime, $value, $stat);
          }
       }
