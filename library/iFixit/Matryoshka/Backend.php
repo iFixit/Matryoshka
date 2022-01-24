@@ -123,9 +123,11 @@ abstract class Backend {
     * $callback returns Backend::NULL, the corresponding set() call won't
     * happen.
     *
-    * @param mixed $reset If truthy, always call the callback to reset the cache.
+    * @template T
+    * @param callable():T $callback A callback to generate the cached value
+    * @param bool $reset If truthy, always call the callback to reset the cache.
     *
-    * @return mixed the value
+    * @return T the value from the cache or the callback
     */
    public function getAndSet($key, callable $callback, int $expiration = 0,
     $reset = false) {
