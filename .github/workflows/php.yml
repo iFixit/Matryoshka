@@ -34,6 +34,8 @@ jobs:
         php-version: ${{ matrix.php-version }}
         extensions: memcached-3.2.0
         coverage: none
+          env:
+        fail-fast: true
 
     - name: Setup Memcached server
       uses: niden/actions-memcached@v7
