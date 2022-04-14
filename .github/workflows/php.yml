@@ -28,12 +28,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install libmemcached
+      run: sudo apt-get install -y libmemcached-dev
+
     - name: Install PHP with extensions
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-version }}
-        extensions: memcached
+        extensions: memcached-3.2.0
         coverage: none
+      env:
+        fail-fast: true
 
     - name: Setup Memcached server
       uses: niden/actions-memcached@v7

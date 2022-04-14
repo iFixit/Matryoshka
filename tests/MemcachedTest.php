@@ -35,7 +35,7 @@ class MemcachedTest extends AbstractBackendTest {
     public function testFailureException() {
       [$key] = $this->getRandomKeyValue();
       $badMemcached = new class extends \Memcached {
-         public function get(string $key, callable $cache_cb = null, int $get_flags = 0): mixed {
+         public function get($key, $cache_cb = null, $get_flags = 0): mixed {
             return false;
          }
 
@@ -63,7 +63,7 @@ class MemcachedTest extends AbstractBackendTest {
       $this->expectExceptionCode(\Memcached::RES_E2BIG);
 
       $badMemcached = new class extends \Memcached {
-         public function set($key, mixed $value, int $expiration = null): bool {
+         public function set($key, $value, $expiration = null): bool {
             return false;
          }
 
