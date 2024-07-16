@@ -30,25 +30,26 @@ class PSR16Adapter implements CacheInterface {
    }
 
    public function getMultiple(iterable $keys, mixed $default = null): iterable {
-      [$found, $missed] = $this->scope->getMultiple(iterator_to_array($keys));
+      /**
+       * @var array<string, mixed> $missed
+       * @var array<string, mixed> $found
+       */
+      [$found, $missed] = $this->scope->getMultiple([...$keys]);
       $missedWithDefault = [];
 
       foreach ($missed as $key => $_value) {
          $missedWithDefault[$key] = $default;
       }
 
-      return [
-         ...$found,
-         ...$missedWithDefault,
-      ];
+      return array_merge($missedWithDefault, $found);
    }
 
    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool {
-      return $this->scope->setMultiple(iterator_to_array($values), $this->getSeconds($ttl));
+      return $this->scope->setMultiple([...$values], $this->getSeconds($ttl));
    }
 
    public function deleteMultiple(iterable $keys): bool {
-      return $this->scope->deleteMultiple(iterator_to_array($keys));
+      return $this->scope->deleteMultiple([...$keys]);
    }
 
    public function has(string $key): bool {
