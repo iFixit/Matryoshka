@@ -43,6 +43,46 @@ class ScopeTest extends AbstractBackendTest {
       $this->assertSame($value1, $scopedCache->get($key1));
    }
 
+   public function testScopeShortCircuitGet() {
+      $scope = 'scope';
+      $mockBackend = $this->getMockBuilder(Matryoshka\Ephemeral::class)
+            ->setMethods(['get'])
+            ->getMock();
+
+      // Assert get() is called only once because a missing scope value means
+      // that all underlying values are also missing.
+      $mockBackend->expects($this->once())
+         ->method('get')
+         ->with($this->stringContains($scope))
+         ->willReturn(Matryoshka\Backend::MISS);
+      $scopedCache = new Matryoshka\Scope($mockBackend, $scope);
+
+      $key = (string)rand(1, 100000);
+      $this->assertNull($scopedCache->get($key));
+   }
+
+   public function testScopeShortCircuitGetMultiple() {
+      $scope = 'scope';
+      $mockBackend = $this->getMockBuilder(Matryoshka\Ephemeral::class)
+            ->setMethods(['get'])
+            ->getMock();
+
+      // Assert get() is called only once because a missing scope value means
+      // that all underlying values are also missing.
+      $mockBackend->expects($this->once())
+         ->method('get')
+         ->with($this->stringContains($scope))
+         ->willReturn(Matryoshka\Backend::MISS);
+      $scopedCache = new Matryoshka\Scope($mockBackend, $scope);
+
+      $key = (string)rand(1, 100000);
+      $keys = [$key => 'no matter'];
+      $this->assertSame(
+         [[$key => Matryoshka\Backend::MISS], $keys],
+         $scopedCache->getMultiple($keys)
+      );
+   }
+
    public function testAbsoluteKey() {
       $memoryCache = new Matryoshka\Ephemeral();
       $scope = 'scope';

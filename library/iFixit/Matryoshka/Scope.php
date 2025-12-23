@@ -21,13 +21,16 @@ class Scope extends Prefix {
       return $this->scopePrefix ?: $this->getScopePrefix();
    }
 
-   public function getScopePrefix(bool $reset = false) {
+   public function getScopePrefix(bool $reset = false, bool $generateOnMiss = true) {
       if ($this->scopePrefix === null || $reset) {
-         $scopeValue = $this->backend->getAndSet($this->getScopeKey(),
-          function() {
-            return substr(md5(microtime() . $this->scopeName), 0, 16);
-         }, 0, $reset);
-
+         $scopeValue = $reset ? self::MISS : $this->backend->get($this->getScopeKey());
+         if ($scopeValue === self::MISS && !$generateOnMiss) {
+            return self::MISS;
+         }
+         if ($reset || ($scopeValue === self::MISS && $generateOnMiss)) {
+            $scopeValue = substr(md5(microtime() . $this->scopeName), 0, 16);
+            $this->backend->set($this->getScopeKey(), $this->scopePrefix);
+         }
          $this->scopePrefix = "{$scopeValue}-";
       }
 
@@ -51,5 +54,21 @@ class Scope extends Prefix {
 
    private function getScopeKey() {
       return "scope-{$this->scopeName}";
+   }
+
+   public function get($key) {
+      // If the scope prefix doesn't exist, all keys in this scope are a miss.
+      if (!$this->getScopePrefix(generateOnMiss: false)) {
+         return self::MISS;
+      }
+      return parent::get($key);
+   }
+
+   public function getMultiple(array $keys) {
+      // If the scope prefix doesn't exist, all keys in this scope are a miss.
+      if (!$this->getScopePrefix(generateOnMiss: false)) {
+         return [array_fill_keys(array_keys($keys), self::MISS), $keys];
+      }
+      return parent::getMultiple($keys);
    }
 }
