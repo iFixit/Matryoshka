@@ -24,14 +24,17 @@ class Scope extends Prefix {
    public function getScopePrefix(bool $reset = false, bool $generateOnMiss = true) {
       if ($this->scopePrefix === null || $reset) {
          $scopeValue = $reset ? self::MISS : $this->backend->get($this->getScopeKey());
-         if ($scopeValue === self::MISS && !$generateOnMiss) {
-            return self::MISS;
+         if ($scopeValue === self::MISS) {
+            if ($generateOnMiss) {
+               $scopeValue = substr(md5(microtime() . $this->scopeName), 0, 16);
+               $this->scopePrefix = "{$scopeValue}-";
+               $this->backend->set($this->getScopeKey(), $scopeValue);
+            } else {
+               return self::MISS;
+            }
+         } else {
+            $this->scopePrefix = "{$scopeValue}-";
          }
-         if ($reset || ($scopeValue === self::MISS && $generateOnMiss)) {
-            $scopeValue = substr(md5(microtime() . $this->scopeName), 0, 16);
-            $this->backend->set($this->getScopeKey(), $this->scopePrefix);
-         }
-         $this->scopePrefix = "{$scopeValue}-";
       }
 
       return $this->scopePrefix;

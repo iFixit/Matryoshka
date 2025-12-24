@@ -12,8 +12,7 @@ class ScopeTest extends AbstractBackendTest {
    public function testScope() {
       $memoryCache = new Matryoshka\Ephemeral();
       $scope = 'scope';
-      $scopedCache = new Matryoshka\Scope($memoryCache,
-       $scope);
+      $scopedCache = new Matryoshka\Scope($memoryCache, $scope);
       list($key1, $value1) = $this->getRandomKeyValue();
       list($key2, $value2) = $this->getRandomKeyValue();
 
@@ -40,6 +39,9 @@ class ScopeTest extends AbstractBackendTest {
 
       $this->assertTrue($scopedCache->set($key1, $value1));
 
+      $this->assertSame($value1, $scopedCache->get($key1));
+
+      $scopedCache = new Matryoshka\Scope($memoryCache, $scope);
       $this->assertSame($value1, $scopedCache->get($key1));
    }
 
