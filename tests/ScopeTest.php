@@ -64,7 +64,7 @@ class ScopeTest extends AbstractBackendTest {
    public function testScopeShortCircuitGetMultiple() {
       $scope = 'scope';
       $mockBackend = $this->getMockBuilder(Matryoshka\Ephemeral::class)
-            ->setMethods(['get'])
+            ->setMethods(['get', 'getMultiple'])
             ->getMock();
 
       // Assert get() is called only once because a missing scope value means
@@ -73,6 +73,11 @@ class ScopeTest extends AbstractBackendTest {
          ->method('get')
          ->with($this->stringContains($scope))
          ->willReturn(Matryoshka\Backend::MISS);
+      // Assert getMultiple() is never called because a missi
+      // we don't need to check individual keys.
+      $mockBackend->expects($this->never())
+         ->method('getMultiple');
+
       $scopedCache = new Matryoshka\Scope($mockBackend, $scope);
 
       $key = (string)rand(1, 100000);
