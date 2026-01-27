@@ -27,14 +27,12 @@ class Scope extends Prefix {
          if ($scopeValue === self::MISS) {
             if ($generateOnMiss) {
                $scopeValue = substr(md5(microtime() . $this->scopeName), 0, 16);
-               $this->scopePrefix = "{$scopeValue}-";
                $this->backend->set($this->getScopeKey(), $scopeValue);
             } else {
                return self::MISS;
             }
-         } else {
-            $this->scopePrefix = "{$scopeValue}-";
          }
+         $this->scopePrefix = "{$scopeValue}-";
       }
 
       return $this->scopePrefix;
