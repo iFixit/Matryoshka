@@ -16,12 +16,8 @@ class MultiScopeTest extends AbstractBackendTest {
    }
 
    public function testMultiScopeBadArgument() {
-      try {
-         new Matryoshka\MultiScope(new Matryoshka\Ephemeral(), ['string']);
-         $this->fail("Doesn't throw InvalidArgumentException");
-      } catch (InvalidArgumentException $e) {
-         // Do nothing.
-      }
+      $this->expectException(InvalidArgumentException::class);
+      new Matryoshka\MultiScope(new Matryoshka\Ephemeral(), ['string']);
    }
 
    public function testMultiScope() {
