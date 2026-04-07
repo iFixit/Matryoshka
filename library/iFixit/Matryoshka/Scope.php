@@ -23,35 +23,26 @@ class Scope extends Prefix {
 
    public function getScopePrefix(bool $reset = false, bool $generateOnMiss = true) {
       if ($this->scopePrefix === null || $reset) {
-         $key = $this->getScopeKey();
-
-         if ($reset) {
-            // Intentional overwrite (used by deleteScope())
-            $scopeValue = $this->generateScopeValue();
-            $this->backend->set($key, $scopeValue);
-         } else {
-            $scopeValue = $this->backend->get($key);
+         if (!$reset && !$generateOnMiss) {
+            $scopeValue = $this->backend->get($this->getScopeKey());
             if ($scopeValue === self::MISS) {
-               if (!$generateOnMiss) {
-                  return self::MISS;
-               }
-               $scopeValue = $this->generateScopeValue();
-               // Use add() for first-writer-wins atomicity.
-               // If another process already wrote the key, use their value.
-               if (!$this->backend->add($key, $scopeValue)) {
-                  $scopeValue = $this->backend->get($key) ?? $scopeValue;
-               }
+               return self::MISS;
             }
+         } else {
+            $scopeValue = $this->backend->getAndSet(
+               $this->getScopeKey(),
+               function() {
+                  return substr(md5(microtime() . $this->scopeName), 0, 16);
+               },
+               0,
+               $reset
+            );
          }
 
          $this->scopePrefix = "{$scopeValue}-";
       }
 
       return $this->scopePrefix;
-   }
-
-   private function generateScopeValue(): string {
-      return substr(md5(microtime() . $this->scopeName), 0, 16);
    }
 
    public function getScopeName() {
