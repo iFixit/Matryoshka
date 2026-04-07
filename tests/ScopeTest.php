@@ -152,4 +152,22 @@ class ScopeTest extends AbstractBackendTest {
 
       $this->assertSame('competitor-data', $scope->get('user-data'));
    }
+
+   /**
+    * If add() fails and the re-fetch also misses (e.g. the backend lost
+    * the key between add and get), the generated prefix is still used.
+    */
+   public function testScopePrefixNotEmpty() {
+      $backend = new class extends Matryoshka\Ephemeral {
+         public function add($key, $value, $expiration = 0) {
+            return false;
+         }
+      };
+      $scope = new Matryoshka\Scope($backend, 'test-scope');
+
+      $prefix = $scope->getScopePrefix();
+
+      $this->assertNotSame('-', $prefix);
+      $this->assertStringEndsWith('-', $prefix);
+   }
 }

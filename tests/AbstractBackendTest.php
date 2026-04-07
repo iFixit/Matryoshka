@@ -285,13 +285,16 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
    }
 
    public function testGetAndSetReturnsComputedValue() {
-      $enable = new Matryoshka\Enable($this->getBackend());
-      $enable->writesEnabled = false;
+      $backend = new class extends Matryoshka\Ephemeral {
+         public function add($key, $value, $expiration = 0) {
+            return false;
+         }
+      };
 
       [$key] = $this->getRandomKeyValue();
       $computedValue = 'computed';
 
-      $result = $enable->getAndSet($key, function() use ($computedValue) {
+      $result = $backend->getAndSet($key, function() use ($computedValue) {
          return $computedValue;
       });
 

@@ -39,7 +39,7 @@ class Scope extends Prefix {
                // Use add() for first-writer-wins atomicity.
                // If another process already wrote the key, use their value.
                if (!$this->backend->add($key, $scopeValue)) {
-                  $scopeValue = $this->backend->get($key);
+                  $scopeValue = $this->backend->get($key) ?? $scopeValue;
                }
             }
          }
