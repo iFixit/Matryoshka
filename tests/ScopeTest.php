@@ -4,28 +4,6 @@ require_once 'AbstractBackendTest.php';
 
 use iFixit\Matryoshka;
 
-/**
- * Simulates a concurrent writer on a shared backend (APCu, Memcached)
- * by injecting behavior between get() returning and the caller acting
- * on the result.
- */
-class RacingBackend extends Matryoshka\BackendWrap {
-   private $afterNextGet = null;
-
-   public function afterNextGet(callable $fn) {
-      $this->afterNextGet = $fn;
-   }
-
-   public function get($key) {
-      $result = $this->backend->get($key);
-      if ($fn = $this->afterNextGet) {
-         $this->afterNextGet = null;
-         $fn($key);
-      }
-      return $result;
-   }
-}
-
 class ScopeTest extends AbstractBackendTest {
    protected function getBackend() {
       return new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
