@@ -4,6 +4,28 @@ require_once 'AbstractBackendTest.php';
 
 use iFixit\Matryoshka;
 
+/**
+ * Simulates a concurrent writer on a shared backend (APCu, Memcached)
+ * by injecting behavior between get() returning and the caller acting
+ * on the result.
+ */
+class RacingBackend extends Matryoshka\BackendWrap {
+   private $afterNextGet = null;
+
+   public function afterNextGet(callable $fn) {
+      $this->afterNextGet = $fn;
+   }
+
+   public function get($key) {
+      $result = $this->backend->get($key);
+      if ($fn = $this->afterNextGet) {
+         $this->afterNextGet = null;
+         $fn($key);
+      }
+      return $result;
+   }
+}
+
 class ScopeTest extends AbstractBackendTest {
    protected function getBackend() {
       return new Matryoshka\Scope(new Matryoshka\Ephemeral(), 'scope');
@@ -97,5 +119,59 @@ class ScopeTest extends AbstractBackendTest {
       [$key] = $this->getRandomKeyValue();
 
       $this->assertEquals($scopedCache->getScopePrefix() . $key, $scopedCache->getAbsoluteKey($key));
+   }
+
+   public function testConcurrentPrefixInitUsesFirstWriter() {
+      $racing = new RacingBackend(new Matryoshka\Ephemeral());
+      $scope = new Matryoshka\Scope($racing, 'test-scope');
+
+      $competitorPrefix = 'competitor-won';
+
+      $racing->afterNextGet(function($key) use ($racing, $competitorPrefix) {
+         $racing->set($key, $competitorPrefix);
+      });
+
+      $prefix = $scope->getScopePrefix();
+
+      $this->assertSame("{$competitorPrefix}-", $prefix);
+      $this->assertSame($competitorPrefix, $racing->get('scope-test-scope'));
+   }
+
+   public function testScopePrefixInitializationNoRace() {
+      $inner = new Matryoshka\Ephemeral();
+      $scope = new Matryoshka\Scope($inner, 'test-scope');
+
+      $prefix = $scope->getScopePrefix();
+
+      $this->assertNotEmpty($prefix);
+      $this->assertStringEndsWith('-', $prefix);
+      $this->assertSame($prefix, $scope->getScopePrefix());
+   }
+
+   public function testDeleteScopeOverwritesIntentionally() {
+      $inner = new Matryoshka\Ephemeral();
+      $scope = new Matryoshka\Scope($inner, 'test-scope');
+
+      $originalPrefix = $scope->getScopePrefix();
+      $scope->deleteScope();
+      $newPrefix = $scope->getScopePrefix();
+
+      $this->assertNotSame($originalPrefix, $newPrefix);
+   }
+
+   public function testConcurrentPrefixInitPreservesFirstWriterData() {
+      $racing = new RacingBackend(new Matryoshka\Ephemeral());
+      $scope = new Matryoshka\Scope($racing, 'test-scope');
+
+      $competitorPrefix = 'competitor-won';
+
+      $racing->afterNextGet(function($key) use ($racing, $competitorPrefix) {
+         $racing->set($key, $competitorPrefix);
+         $racing->set("{$competitorPrefix}-user-data", 'competitor-data');
+      });
+
+      $scope->getScopePrefix();
+
+      $this->assertSame('competitor-data', $scope->get('user-data'));
    }
 }
