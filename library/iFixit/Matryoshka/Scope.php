@@ -22,19 +22,31 @@ class Scope extends Prefix {
    }
 
    public function getScopePrefix(bool $reset = false, bool $generateOnMiss = true) {
-      if ($this->scopePrefix === null || $reset) {
-         $scopeValue = $reset ? self::MISS : $this->backend->get($this->getScopeKey());
-         if ($scopeValue === self::MISS) {
-            if ($generateOnMiss) {
-               $scopeValue = substr(md5(microtime() . $this->scopeName), 0, 16);
-               $this->backend->set($this->getScopeKey(), $scopeValue);
-            } else {
-               return self::MISS;
-            }
-         }
-         $this->scopePrefix = "{$scopeValue}-";
+      if ($this->scopePrefix !== null && !$reset) {
+         return $this->scopePrefix;
       }
 
+      if ($reset) {
+         $scopeValue = substr(md5(microtime() . $this->scopeName), 0, 16);
+         $this->backend->set($this->getScopeKey(), $scopeValue);
+         $this->scopePrefix = "{$scopeValue}-";
+         return $this->scopePrefix;
+      }
+
+      if ($generateOnMiss) {
+         $scopeValue = $this->backend->getAndAdd(
+            $this->getScopeKey(),
+            fn() => substr(md5(microtime() . $this->scopeName), 0, 16)
+         );
+         $this->scopePrefix = "{$scopeValue}-";
+         return $this->scopePrefix;
+      }
+
+      $scopeValue = $this->backend->get($this->getScopeKey());
+      if ($scopeValue === self::MISS) {
+         return self::MISS;
+      }
+      $this->scopePrefix = "{$scopeValue}-";
       return $this->scopePrefix;
    }
 
