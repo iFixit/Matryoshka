@@ -156,7 +156,7 @@ abstract class Backend {
     *
     * @return T the value from the cache or the callback
     */
-   public function getAndAdd($key, callable $callback, int $expiration = 0) {
+   public function getOrAdd($key, callable $callback, int $expiration = 0) {
       $value = $this->get($key);
 
       if ($value === self::MISS) {

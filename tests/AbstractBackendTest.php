@@ -284,7 +284,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($value, $backend->get($key));
    }
 
-   public function testgetAndAdd() {
+   public function testgetOrAdd() {
       $backend = $this->getBackend();
       list($key, $value) = $this->getRandomKeyValue();
 
@@ -297,7 +297,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       };
 
       // Miss: callback is invoked and value is added.
-      $result = $backend->getAndAdd($key, $callback);
+      $result = $backend->getOrAdd($key, $callback);
 
       $this->assertTrue($miss);
       $this->assertSame($value, $result);
@@ -305,7 +305,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
 
       // Hit: callback is not invoked.
       $miss = false;
-      $result = $backend->getAndAdd($key, $callback);
+      $result = $backend->getOrAdd($key, $callback);
 
       $this->assertFalse($miss);
       $this->assertSame($value, $result);
@@ -313,7 +313,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
 
       // Key already exists: first writer wins, value is not overwritten.
       list(, $newValue) = $this->getRandomKeyValue();
-      $result = $backend->getAndAdd($key, function() use ($newValue) {
+      $result = $backend->getOrAdd($key, function() use ($newValue) {
          return $newValue;
       });
 
@@ -322,7 +322,7 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
 
       // Null callback return: add() is not called, null is returned.
       list($key2) = $this->getRandomKeyValue();
-      $result = $backend->getAndAdd($key2, function() { return null; });
+      $result = $backend->getOrAdd($key2, function() { return null; });
 
       $this->assertNull($result);
       $this->assertNull($backend->get($key2));

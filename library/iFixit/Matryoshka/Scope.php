@@ -34,7 +34,7 @@ class Scope extends Prefix {
       }
 
       if ($generateOnMiss) {
-         $scopeValue = $this->backend->getAndAdd(
+         $scopeValue = $this->backend->getOrAdd(
             $this->getScopeKey(),
             fn() => substr(md5(microtime() . $this->scopeName), 0, 16)
          );
