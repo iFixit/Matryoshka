@@ -145,6 +145,34 @@ abstract class Backend {
    }
 
    /**
+    * Like getAndSet, but uses add() instead of set() so the first writer
+    * wins in a race. If another caller already populated the key, the
+    * winning value is returned instead of the callback's value.
+    *
+    * If $callback returns Backend::MISS, the add() call won't happen.
+    *
+    * @template T
+    * @param callable():T $callback A callback to generate the cached value
+    *
+    * @return T the value from the cache or the callback
+    */
+   public function getAndAdd($key, callable $callback, int $expiration = 0) {
+      $value = $this->get($key);
+
+      if ($value === self::MISS) {
+         $value = $callback();
+
+         if ($value !== self::MISS) {
+            if (!$this->add($key, $value, $expiration)) {
+               $value = $this->get($key) ?? $value;
+            }
+         }
+      }
+
+      return $value;
+   }
+
+   /**
     * Wrapper around getMultiple that uses the provided callback to retrieve
     * and populate the cache for any misses.
     *

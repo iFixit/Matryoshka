@@ -284,6 +284,50 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertSame($value, $backend->get($key));
    }
 
+   public function testgetAndAdd() {
+      $backend = $this->getBackend();
+      list($key, $value) = $this->getRandomKeyValue();
+
+      $this->assertNull($backend->get($key));
+
+      $miss = false;
+      $callback = function() use ($value, &$miss) {
+         $miss = true;
+         return $value;
+      };
+
+      // Miss: callback is invoked and value is added.
+      $result = $backend->getAndAdd($key, $callback);
+
+      $this->assertTrue($miss);
+      $this->assertSame($value, $result);
+      $this->assertSame($value, $backend->get($key));
+
+      // Hit: callback is not invoked.
+      $miss = false;
+      $result = $backend->getAndAdd($key, $callback);
+
+      $this->assertFalse($miss);
+      $this->assertSame($value, $result);
+      $this->assertSame($value, $backend->get($key));
+
+      // Key already exists: first writer wins, value is not overwritten.
+      list(, $newValue) = $this->getRandomKeyValue();
+      $result = $backend->getAndAdd($key, function() use ($newValue) {
+         return $newValue;
+      });
+
+      $this->assertSame($value, $result);
+      $this->assertSame($value, $backend->get($key));
+
+      // Null callback return: add() is not called, null is returned.
+      list($key2) = $this->getRandomKeyValue();
+      $result = $backend->getAndAdd($key2, function() { return null; });
+
+      $this->assertNull($result);
+      $this->assertNull($backend->get($key2));
+   }
+
    public function testgetAndSetMultiple() {
       $backend = $this->getBackend();
       list($key1, $value1, $id1) = $this->getRandomKeyValueId();
