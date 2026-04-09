@@ -98,4 +98,76 @@ class ScopeTest extends AbstractBackendTest {
 
       $this->assertEquals($scopedCache->getScopePrefix() . $key, $scopedCache->getAbsoluteKey($key));
    }
+
+   public function testPrefixFirstWriterWins() {
+      $racing = new RacingBackend(new Matryoshka\Ephemeral());
+      $scope = new Matryoshka\Scope($racing, 'test-scope');
+
+      $competitorPrefix = 'competitor-won';
+
+      $racing->afterNextGet(function($key) use ($racing, $competitorPrefix) {
+         $racing->set($key, $competitorPrefix);
+      });
+
+      $prefix = $scope->getScopePrefix();
+
+      $this->assertSame("{$competitorPrefix}-", $prefix);
+      $this->assertSame($competitorPrefix, $racing->get('scope-test-scope'));
+   }
+
+   public function testPrefixInit() {
+      $inner = new Matryoshka\Ephemeral();
+      $scope = new Matryoshka\Scope($inner, 'test-scope');
+
+      $prefix = $scope->getScopePrefix();
+
+      $this->assertNotEmpty($prefix);
+      $this->assertStringEndsWith('-', $prefix);
+      $this->assertSame($prefix, $scope->getScopePrefix());
+   }
+
+   public function testDeleteScopeOverwrites() {
+      $inner = new Matryoshka\Ephemeral();
+      $scope = new Matryoshka\Scope($inner, 'test-scope');
+
+      $originalPrefix = $scope->getScopePrefix();
+      $scope->deleteScope();
+      $newPrefix = $scope->getScopePrefix();
+
+      $this->assertNotSame($originalPrefix, $newPrefix);
+   }
+
+   public function testPrefixRacePreservesData() {
+      $racing = new RacingBackend(new Matryoshka\Ephemeral());
+      $scope = new Matryoshka\Scope($racing, 'test-scope');
+
+      $competitorPrefix = 'competitor-won';
+
+      $racing->afterNextGet(function($key) use ($racing, $competitorPrefix) {
+         $racing->set($key, $competitorPrefix);
+         $racing->set("{$competitorPrefix}-user-data", 'competitor-data');
+      });
+
+      $scope->getScopePrefix();
+
+      $this->assertSame('competitor-data', $scope->get('user-data'));
+   }
+
+   /**
+    * If add() fails and the re-fetch also misses (e.g. the backend lost
+    * the key between add and get), the generated prefix is still used.
+    */
+   public function testPrefixNonEmptyOnAddFailure() {
+      $backend = new class extends Matryoshka\Ephemeral {
+         public function add($key, $value, $expiration = 0) {
+            return false;
+         }
+      };
+      $scope = new Matryoshka\Scope($backend, 'test-scope');
+
+      $prefix = $scope->getScopePrefix();
+
+      $this->assertNotSame('-', $prefix);
+      $this->assertStringEndsWith('-', $prefix);
+   }
 }
