@@ -328,6 +328,42 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
       $this->assertNull($backend->get($key2));
    }
 
+   public function testGetOrAddFallbackValue() {
+      $backend = new class extends Matryoshka\Ephemeral {
+         public function add($key, $value, $expiration = 0) {
+            return false;
+         }
+      };
+
+      [$key] = $this->getRandomKeyValue();
+      $computedValue = 'computed';
+
+      $result = $backend->getOrAdd($key, function() use ($computedValue) {
+         return $computedValue;
+      });
+
+      $this->assertSame($computedValue, $result);
+   }
+
+   public function testGetOrAddFirstWriterWins() {
+      $racing = new RacingBackend($this->getBackend());
+      [$key] = $this->getRandomKeyValue();
+
+      $firstWriterValue = 'first-writer';
+      $secondWriterValue = 'second-writer';
+
+      $racing->afterNextGet(function($key) use ($racing, $firstWriterValue) {
+         $racing->set($key, $firstWriterValue);
+      });
+
+      $result = $racing->getOrAdd($key, function() use ($secondWriterValue) {
+         return $secondWriterValue;
+      });
+
+      $this->assertSame($firstWriterValue, $result);
+      $this->assertSame($firstWriterValue, $racing->get($key));
+   }
+
    public function testgetAndSetMultiple() {
       $backend = $this->getBackend();
       list($key1, $value1, $id1) = $this->getRandomKeyValueId();
@@ -531,6 +567,27 @@ abstract class AbstractBackendTest extends PHPUnit_Framework_TestCase {
     */
    protected function isCharExemptFromKeyEquivalence($char) {
       return false;
+   }
+}
+
+/**
+ * Simulates a concurrent writer on a shared backend by injecting
+ * behavior between get() returning and the caller acting on the result.
+ */
+class RacingBackend extends Matryoshka\BackendWrap {
+   private $afterNextGet = null;
+
+   public function afterNextGet(callable $fn) {
+      $this->afterNextGet = $fn;
+   }
+
+   public function get($key) {
+      $result = $this->backend->get($key);
+      if ($fn = $this->afterNextGet) {
+         $this->afterNextGet = null;
+         $fn($key);
+      }
+      return $result;
    }
 }
 
