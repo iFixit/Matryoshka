@@ -21,9 +21,9 @@ class Scope extends Prefix {
       return $this->scopePrefix ?: $this->getScopePrefix();
    }
 
-   public function getScopePrefix(bool $reset = false, bool $generateOnMiss = true) {
-      if ($this->scopePrefix === null || $reset) {
-         $scopeValue = $reset ? self::MISS : $this->backend->get($this->getScopeKey());
+   public function getScopePrefix(bool $generateOnMiss = true) {
+      if ($this->scopePrefix === null) {
+         $scopeValue = $this->backend->get($this->getScopeKey());
          if ($scopeValue === self::MISS) {
             if ($generateOnMiss) {
                $scopeValue = substr(md5(microtime() . $this->scopeName), 0, 16);
