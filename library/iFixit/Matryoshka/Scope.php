@@ -9,7 +9,7 @@ class Scope extends Prefix {
    private $scopePrefix;
 
    public function __construct(Backend $backend, $scopeName) {
-      // The prefix we pass along to the Prefix() constructor is never used, so 
+      // The prefix we pass along to the Prefix() constructor is never used, so
       // it doesn't matter.
       parent::__construct($backend, /* $prefix = */ null);
 
@@ -21,9 +21,9 @@ class Scope extends Prefix {
       return $this->scopePrefix ?: $this->getScopePrefix();
    }
 
-   public function getScopePrefix(bool $reset = false, bool $generateOnMiss = true) {
-      if ($this->scopePrefix === null || $reset) {
-         $scopeValue = $reset ? self::MISS : $this->backend->get($this->getScopeKey());
+   public function getScopePrefix(bool $generateOnMiss = true) {
+      if ($this->scopePrefix === null) {
+         $scopeValue = $this->backend->get($this->getScopeKey());
          if ($scopeValue === self::MISS) {
             if ($generateOnMiss) {
                $scopeValue = substr(md5(microtime() . $this->scopeName), 0, 16);
@@ -47,10 +47,12 @@ class Scope extends Prefix {
     * this scope.
     */
    public function deleteScope(): bool {
-      // Delete the scope by setting a new value for it.
-      $prefix = $this->getScopePrefix($reset = true);
+      // Explicitly delete the scope key from the backend to ensure that it is
+      // removed.
+      $this->backend->delete($this->getScopeKey());
+      $this->scopePrefix = null;
 
-      return $prefix !== self::MISS;
+      return true;
    }
 
    private function getScopeKey() {
