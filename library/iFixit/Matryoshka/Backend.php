@@ -148,14 +148,18 @@ abstract class Backend {
     * Wrapper around getMultiple that uses the provided callback to retrieve
     * and populate the cache for any misses.
     *
-    * @param callable(array):array $callback
+    * @template TKey of array-key
+    * @template TId
+    * @template TValue
+    * @param array<TKey, TId> $keys Array of [key => id]
+    * @param callable(non-empty-array<TKey, TId>): array<array-key, TValue> $callback
     *           param $missing Array of [key => id] that the caller needs to
     *                          generate the values for.
     *           returns Array of [key => value] for the found values. The
     *                   order does not matter. Additional key/values in the
     *                   array that are not in the missing array are ignored.
     * @param int $expiration
-    * @return array
+    * @return array<TKey, TValue>
     *         Array of [key => value] in the same order as the requested keys.
     *         This does not include values not returned by the callback.
     */
